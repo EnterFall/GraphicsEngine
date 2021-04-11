@@ -1,12 +1,30 @@
 #pragma once
 #include "EFWin.h"
+#include "EFException.h"
 #include <sstream>
 
+#define EFWndExcept(errCode) Window::Exception(__LINE__, __FILE__, errCode)
+#define EFWndExceptLastError() Window::Exception(__LINE__, __FILE__, GetLastError())
 class Window
 {
-public:
+private:
 	HWND hWnd;
 
+public:
+	class Exception : public EFException
+	{
+	private:
+		HRESULT errCode;
+	public:
+		static std::string TranslateErrorCode(HRESULT errCode);
+
+		Exception(int line, std::string file, HRESULT errCode);
+		HRESULT GetErrorCode() const;
+		std::string GetErrorString() const;
+
+		const char* what() const override;
+		std::string GetType() const override;
+	};
 private:
 	class WindowClass
 	{
@@ -27,6 +45,7 @@ private:
 public:
 	Window(int width, int height, std::string title);
 	~Window();
+	HWND GetHWnd();
 	Window(const Window&) = delete;
 	Window& operator =(const Window&) = delete;
 private:

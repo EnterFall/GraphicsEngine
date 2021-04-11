@@ -18,10 +18,12 @@ Window::WindowClass::WindowClass() : hInstance(GetModuleHandle(nullptr))
 	wc.lpszClassName = className;
 	wc.hIconSm = nullptr;
 
-	RegisterClassEx(&wc);
+	if (RegisterClassEx(&wc) == 0)
+		throw EFWndExceptLastError();
 }
 
-Window::WindowClass::~WindowClass() {
+Window::WindowClass::~WindowClass() 
+{
 	UnregisterClass(className, hInstance);
 }
 
@@ -42,10 +44,10 @@ Window::Window(int width, int height, std::string title)
 	rect.right = width + rect.left;
 	rect.top = 100;
 	rect.bottom = height + rect.top;
-
 	auto styles = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 
-	AdjustWindowRect(&rect, styles, false);
+	if (AdjustWindowRect(&rect, styles, false) == 0);
+		throw EFWndExceptLastError();
 
 	hWnd = CreateWindowEx(
 		0,
@@ -58,12 +60,20 @@ Window::Window(int width, int height, std::string title)
 		nullptr,
 		WindowClass::GetInstance(),
 		this);
+	if (hWnd == NULL)
+		throw EFWndExceptLastError();
+
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
 }
 
 Window::~Window()
 {
 	DestroyWindow(hWnd);
+}
+
+HWND Window::GetHWnd()
+{
+	return hWnd;
 }
 
 LRESULT Window::RedirectMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -112,4 +122,54 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
+}
+
+std::string Window::Exception::TranslateErrorCode(HRESULT errCode)
+{
+	char* pMesBuffer = nullptr;
+	DWORD msgLen = FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		nullptr,
+		errCode,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		reinterpret_cast<LPSTR>(&pMesBuffer),
+		0,
+		nullptr);
+	if (msgLen == 0)
+	{
+		return "Unidentified error code";
+	}
+	std::string error = pMesBuffer;
+	LocalFree(pMesBuffer);
+	return error;
+}
+
+Window::Exception::Exception(int line, std::string file, HRESULT errCode)
+	: EFException(line, file), errCode(errCode)
+{}
+
+HRESULT Window::Exception::GetErrorCode() const
+{
+	return errCode;
+}
+
+std::string Window::Exception::GetErrorString() const
+{
+	return TranslateErrorCode(errCode);
+}
+
+const char* Window::Exception::what() const
+{
+	std::ostringstream stream;
+	stream << GetType() << std::endl
+		<< GetString() << std::endl
+		<< "[Error code] " << GetErrorCode() << std::endl
+		<< "[Description] " << GetErrorString();
+	whatBuffer = stream.str();
+	return whatBuffer.c_str();
+}
+
+std::string Window::Exception::GetType() const
+{
+	return "EF Window Exception";
 }
