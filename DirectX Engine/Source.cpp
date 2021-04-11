@@ -7,7 +7,7 @@ int WINAPI WinMain(
 	int nCmdShow)
 {
 	Window w1(400,200, "LolTestLol");
-	
+
 	MSG msg;
 	BOOL result;
 	while ((result = GetMessage(&msg, nullptr, 0, 0)) > 0)

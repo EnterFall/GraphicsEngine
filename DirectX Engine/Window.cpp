@@ -58,9 +58,6 @@ Window::Window(int width, int height, std::string title)
 		nullptr,
 		WindowClass::GetInstance(),
 		this);
-
-	SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-	SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Window::RedirectMsg));
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
 }
 
@@ -76,7 +73,7 @@ LRESULT Window::RedirectMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		auto pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
 		auto pWnd = static_cast<Window*>(pCreate->lpCreateParams);
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
-		SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Window::RedirectMsg));
+		SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(Window::RedirectMsg));
 		return pWnd->HandleMsg(hWnd, msg, wParam, lParam);
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
