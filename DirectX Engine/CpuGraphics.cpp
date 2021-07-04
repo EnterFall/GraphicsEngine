@@ -163,7 +163,7 @@ void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Ve
 void CpuGraphics::DrawProjectionTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, unsigned int color)
 {
 	// Backface culling
-	if ((v1 - v0).Cross(v2 - v0).Dot(cameraPos - v0) < 0)
+	//if ((v1 - v0).Cross(v2 - v0).Dot(v0 - cameraPos) < 0)
 	{
 		Vec2f val0;
 		Vec2f val1;
