@@ -1,16 +1,25 @@
 #pragma once
 #include "EFWin.h"
 #include "EFException.h"
-#include <sstream>
+#include "Vec2f.h"
+#include "CpuGraphics.h"
+#include "Keyboard.h"
+#include <memory>
+#include <algorithm>
 
-#define EFWndExcept(errCode) Window::Exception(__LINE__, __FILE__, errCode)
-#define EFWndExceptLastError() Window::Exception(__LINE__, __FILE__, GetLastError())
+#define WindowExcept(errCode) Window::Exception(__LINE__, __FILE__, errCode)
+#define WindowExceptLastError() Window::Exception(__LINE__, __FILE__, GetLastError())
 class Window
 {
 private:
 	HWND hWnd;
-
+	HDC hdc;
 public:
+	int height;
+	int width;
+	CpuGraphics graphics;
+	Keyboard keyboard;
+
 	class Exception : public EFException
 	{
 	private:
@@ -26,30 +35,38 @@ public:
 		std::string GetType() const override;
 	};
 private:
-	class WindowClass
+	class StaticWindowClass
 	{
 	private:
-		static WindowClass wndClass;
+		static StaticWindowClass wndClass;
 		static constexpr const char* className = "EFWindowEngine";
 		HINSTANCE hInstance;
 	public:
 		static HINSTANCE GetInstance();
 		static LPCSTR GetName();
 	private:
-		WindowClass();
-		~WindowClass();
-		WindowClass(const WindowClass&) = delete;
-		WindowClass& operator =(const WindowClass&) = delete;
+		StaticWindowClass();
+		~StaticWindowClass();
+		StaticWindowClass(const StaticWindowClass&) = delete;
+		StaticWindowClass& operator =(const StaticWindowClass&) = delete;
 	};
 
 public:
 	Window(int width, int height, std::string title);
 	~Window();
-	HWND GetHWnd();
+
+	HWND GetHWnd() const;
+	CpuGraphics& GetGraphics();
+	void SetTitle(const std::string& newTitle) const;
+	
+	void UpdateScreen();
+
 	Window(const Window&) = delete;
 	Window& operator =(const Window&) = delete;
 private:
 	static LRESULT WINAPI RedirectMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT WINAPI RedirectMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+	void OnSize();
 };

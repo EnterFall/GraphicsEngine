@@ -1,12 +1,13 @@
 #include "Window.h"
 
-Window::WindowClass Window::WindowClass::wndClass;
+Window::StaticWindowClass Window::StaticWindowClass::wndClass = StaticWindowClass();
 
-Window::WindowClass::WindowClass() : hInstance(GetModuleHandle(nullptr))
+Window::StaticWindowClass::StaticWindowClass() : hInstance(GetModuleHandle(nullptr))
 {
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
-	wc.style = CS_OWNDC;
+	//wc.style = CS_OWNDC;
+	wc.style = CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = RedirectMsgSetup;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
@@ -19,20 +20,20 @@ Window::WindowClass::WindowClass() : hInstance(GetModuleHandle(nullptr))
 	wc.hIconSm = nullptr;
 
 	if (RegisterClassEx(&wc) == 0)
-		throw EFWndExceptLastError();
+		throw WindowExceptLastError();
 }
 
-Window::WindowClass::~WindowClass() 
+Window::StaticWindowClass::~StaticWindowClass() 
 {
 	UnregisterClass(className, hInstance);
 }
 
-HINSTANCE Window::WindowClass::GetInstance()
+HINSTANCE Window::StaticWindowClass::GetInstance()
 {
 	return wndClass.hInstance;
 }
 
-LPCSTR Window::WindowClass::GetName()
+LPCSTR Window::StaticWindowClass::GetName()
 {
 	return wndClass.className;
 }
@@ -44,25 +45,31 @@ Window::Window(int width, int height, std::string title)
 	rect.right = width + rect.left;
 	rect.top = 100;
 	rect.bottom = height + rect.top;
-	auto styles = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
+	//auto styles = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
+	auto styles = WS_OVERLAPPEDWINDOW;
 
-	if (AdjustWindowRect(&rect, styles, false) == 0);
-		throw EFWndExceptLastError();
+	if (!AdjustWindowRect(&rect, styles, false))
+		throw WindowExceptLastError();
 
 	hWnd = CreateWindowEx(
 		0,
-		WindowClass::GetName(),
+		StaticWindowClass::GetName(),
 		title.c_str(),
 		styles,
-		CW_USEDEFAULT, CW_USEDEFAULT, 
-		rect.right - rect.left, rect.bottom - rect.top,
+		CW_USEDEFAULT, CW_USEDEFAULT,
+		width, height,
 		nullptr,
 		nullptr,
-		WindowClass::GetInstance(),
+		StaticWindowClass::GetInstance(),
 		this);
 	if (hWnd == NULL)
-		throw EFWndExceptLastError();
+		throw WindowExceptLastError();
 
+	this->width = width;
+	this->height = height;
+	this->hdc = GetDC(hWnd);
+
+	// // - WS_VISIBLE is set
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
 }
 
@@ -71,9 +78,44 @@ Window::~Window()
 	DestroyWindow(hWnd);
 }
 
-HWND Window::GetHWnd()
+HWND Window::GetHWnd() const
 {
 	return hWnd;
+}
+
+CpuGraphics& Window::GetGraphics()
+{
+	return graphics;
+}
+
+void Window::SetTitle(const std::string& newTitle) const
+{
+	SetWindowText(hWnd, newTitle.c_str());
+}
+
+void Window::UpdateScreen()
+{
+	RECT rect;
+
+	if (!GetClientRect(hWnd, &rect))
+		throw WindowExceptLastError();
+
+	int width = rect.right - rect.left;
+	int height = rect.bottom - rect.top;
+	this->width = width;
+	this->height = height;
+
+	POINT location{ 0, 0 };
+	if (!ClientToScreen(hWnd, &location))
+		throw WindowExceptLastError();
+
+	if (!StretchDIBits(hdc, 0, 0, width, height, location.x, graphics.bufferHeight - location.y - height, width, height, graphics.GetBuffer(), &graphics.GetBufferInfo(), DIB_RGB_COLORS, SRCCOPY))
+		throw WindowExceptLastError();
+}
+
+void Window::OnSize()
+{
+	UpdateScreen();
 }
 
 LRESULT Window::RedirectMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -97,31 +139,38 @@ LRESULT Window::RedirectMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static std::string title;
 	switch (msg)
 	{
 	case WM_KEYDOWN:
-		if (wParam == 'F')
-		{
-			SetWindowText(hWnd, "Respects!");
-		}
+		keyboard.KeyDownFromMessage(static_cast<char>(wParam), static_cast<char>(lParam));
+		break;
+	case WM_KEYUP:
+		keyboard.KeyUpFromMessage(static_cast<char>(wParam), static_cast<char>(lParam));
 		break;
 	case WM_CHAR:
-		title.push_back(wParam);
-		SetWindowText(hWnd, title.c_str());
+		break;
+	case WM_KILLFOCUS:
+		keyboard.Clear();
 		break;
 	case WM_CLOSE:
-		PostQuitMessage(69);
-		return 0;
-	case WM_LBUTTONDOWN:
-		auto p = MAKEPOINTS(lParam);
-		std::ostringstream s;
-		s << p.x << "  " << p.y;
-		SetWindowText(hWnd, s.str().c_str());
+		PostQuitMessage(0);
 		break;
+	case WM_LBUTTONDOWN:
+		break;
+	case WM_SIZE:
+		OnSize();
+		break;
+	case WM_SIZING:
+		OnSize();
+		return true;
+	case WM_MOVING:
+		OnSize();
+		return true;
+	default:
+		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 
-	return DefWindowProc(hWnd, msg, wParam, lParam);
+	return 0;
 }
 
 std::string Window::Exception::TranslateErrorCode(HRESULT errCode)
