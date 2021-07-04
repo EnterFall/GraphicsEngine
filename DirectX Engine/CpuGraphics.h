@@ -16,6 +16,8 @@ public:
 	const int bufferHeight = 1080;
 	const float fovLen = 800;
 
+	const float fovScalar = 1.0f / (fovLen * fovLen);
+
 	Vec3f cameraPos = Vec3f(0.0f, 0.0f, 0.0f);
 	Vec3f cameraX90 = Vec3f(1.0f, 0.0f, 0.0f);
 	Vec3f cameraY90 = Vec3f(0.0f, 1.0f, 0.0f);

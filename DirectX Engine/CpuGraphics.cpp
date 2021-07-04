@@ -201,28 +201,25 @@ void CpuGraphics::DrawCrosshair()
 	}
 }
 
+// Z value is not computed
 Vec2f CpuGraphics::Transform(const Vec3f& camPos, const Vec3f& cam, const Vec3f& vertex) const
 {
 	Vec3f camToVert = vertex - camPos;
-	auto projScale = cameraDirection.Dot(camToVert) / (fovLen * fovLen);
-	Vec3f vertProj = cam * projScale;
-	
-	Vec3f vertProjPos = camPos + vertProj;
-	Vec3f vertDir = vertex - vertProjPos;
 
-	float projAng = acos(vertDir.Cos(cameraY90));
-	float crossCamX = cameraY90.y * vertDir.z - cameraY90.z * vertDir.y;
-	projAng = MathHelper::PI_2_f + ((crossCamX > 0) != (cam.x > 0) ? projAng : -projAng);
-	
-	float resultScale = vertDir.Length() / projScale;
-	return Vec2f((bufferWidth >> 1) - cos(projAng) * resultScale, (bufferHeight >> 1) + sin(projAng) * resultScale);
+	// projScale = (camToVert.Length() * cameraDirection.Cos(camToVert)) / cameraDirection.Length();
+	auto projScale = cameraDirection.Dot(camToVert) * fovScalar;
+
+	auto projX = cameraX90.Dot(camToVert);
+	auto projY = cameraY90.Dot(camToVert);
+
+	return Vec2f((bufferWidth >> 1) + projX / projScale, (bufferHeight >> 1) + projY / projScale);
 }
 
 Vec2f CpuGraphics::TransformByMatrix(const Vec3f& vertex) const
 {
 	Vec3f camToVert = vertex - cameraPos;
-	auto projScale = cameraDirection.Dot(camToVert) / (fovLen * fovLen);
+	auto projScale = cameraDirection.Dot(camToVert) * fovScalar;
 
-	auto res = transform.Mult(camToVert);
-	return Vec2f((bufferWidth >> 1) + res.x / projScale, (bufferHeight >> 1) + res.y / projScale);
+	auto proj = transform.Mult(camToVert) / projScale;
+	return Vec2f((bufferWidth >> 1) + proj.x, (bufferHeight >> 1) + proj.y);
 }
