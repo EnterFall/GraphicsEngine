@@ -43,6 +43,24 @@ int WINAPI WinMain(
 			{
 				w1.graphics.cameraPos = w1.graphics.cameraPos - (w1.graphics.cameraZ90 * w1.graphics.travelSpeed);
 			}
+			if (w1.keyboard.IsPressed('D'))
+			{
+				w1.graphics.cameraPos = w1.graphics.cameraPos + (w1.graphics.cameraX90 * w1.graphics.travelSpeed);
+			}
+			if (w1.keyboard.IsPressed('A'))
+			{
+				w1.graphics.cameraPos = w1.graphics.cameraPos - (w1.graphics.cameraX90 * w1.graphics.travelSpeed);
+			}
+			if (w1.keyboard.IsPressed(VK_SHIFT))
+			{
+				w1.graphics.cameraPos = w1.graphics.cameraPos + (w1.graphics.cameraY90 * w1.graphics.travelSpeed);
+			}
+			if (w1.keyboard.IsPressed(VK_SPACE))
+			{
+				w1.graphics.cameraPos = w1.graphics.cameraPos - (w1.graphics.cameraY90 * w1.graphics.travelSpeed);
+			}
+
+
 			if (w1.keyboard.IsPressed('T'))
 			{
 				w1.graphics.isMatrixTransform = !w1.graphics.isMatrixTransform;
