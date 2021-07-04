@@ -37,16 +37,16 @@ int WINAPI WinMain(
 			}
 			if (w1.keyboard.IsPressed('W'))
 			{
-				w1.graphics.cameraPos = w1.graphics.cameraPos + (w1.graphics.cameraDirection / 100.f);
+				w1.graphics.cameraPos = w1.graphics.cameraPos + (w1.graphics.cameraZ90 * w1.graphics.travelSpeed);
 			}
 			if (w1.keyboard.IsPressed('S'))
 			{
-				w1.graphics.cameraPos = w1.graphics.cameraPos - (w1.graphics.cameraDirection / 100.f);
+				w1.graphics.cameraPos = w1.graphics.cameraPos - (w1.graphics.cameraZ90 * w1.graphics.travelSpeed);
 			}
 			if (w1.keyboard.IsPressed('T'))
 			{
 				w1.graphics.isMatrixTransform = !w1.graphics.isMatrixTransform;
-				Sleep(40);
+				Sleep(80);
 			}
 
 

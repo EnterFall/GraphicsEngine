@@ -25,6 +25,7 @@ public:
 	Vec3f cameraDirection = Vec3f(0.0f, 0.0f, 1.0f);
 	Matrix3f transform;
 
+	float travelSpeed = 4.0f;
 	bool isMatrixTransform = true;
 	
 	
