@@ -162,25 +162,28 @@ void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Ve
 
 void CpuGraphics::DrawProjectionTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, unsigned int color)
 {
-
-	Vec2f val0;
-	Vec2f val1;
-	Vec2f val2;
-	if (isMatrixTransform)
+	// Backface culling
+	if ((v1 - v0).Cross(v2 - v0).Dot(cameraPos - v0) < 0)
 	{
-		val0 = TransformByMatrix(v0);
-		val1 = TransformByMatrix(v1);
-		val2 = TransformByMatrix(v2);
-	}
-	else
-	{
-		val0 = Transform(cameraPos, cameraDirection, v0);
-		val1 = Transform(cameraPos, cameraDirection, v1);
-		val2 = Transform(cameraPos, cameraDirection, v2);
-	}
-	
+		Vec2f val0;
+		Vec2f val1;
+		Vec2f val2;
+		if (isMatrixTransform)
+		{
+			val0 = TransformByMatrix(v0);
+			val1 = TransformByMatrix(v1);
+			val2 = TransformByMatrix(v2);
+		}
+		else
+		{
+			val0 = Transform(cameraPos, cameraDirection, v0);
+			val1 = Transform(cameraPos, cameraDirection, v1);
+			val2 = Transform(cameraPos, cameraDirection, v2);
+		}
 
-	DrawTriangle(val0, val1, val2, color);
+
+		DrawTriangle(val0, val1, val2, color);
+	}
 }
 
 void CpuGraphics::DrawRect(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, const Vec2f& v3, unsigned int color)
