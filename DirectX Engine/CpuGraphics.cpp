@@ -224,6 +224,23 @@ void CpuGraphics::DrawCube(const Vec3f& p0, const Vec3f& p1, unsigned int color)
 	DrawTriangle(p1, p1 - y - z, p1 - z, color);
 }
 
+void CpuGraphics::DrawPoligon(const std::initializer_list<Vec2f>& points, unsigned int color)
+{
+	auto pointsArr = points.begin();
+	auto v0 = pointsArr;
+	auto v1 = pointsArr + 1;
+	auto v2 = pointsArr + 2;
+	int size = points.size();
+	int i = 2;
+	while (i < size)
+	{
+		DrawTriangle(*v0, *v1, *v2, color);
+		v1 = v2;
+		v2 = pointsArr + 1 + i;
+		i++;
+	}
+}
+
 void CpuGraphics::DrawCrosshair()
 {
 	int offset = 10;

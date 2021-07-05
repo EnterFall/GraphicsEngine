@@ -107,6 +107,8 @@ int WINAPI WinMain(
 				w1.graphics.DrawTriangle({ 0.0f, 100.0f, 500.0f }, { 200.0f, 200.0f, 500.0f }, { 200.0f, 0.0f, 500.0f }, 0xFFFFFF);
 				
 				w1.graphics.DrawCube({ 0.0f, 0.0f, 0.0f }, { 100.0f, 100.0f, 100.0f }, 0xFFFFFF);
+
+				w1.graphics.DrawPoligon({ { 0.0f, 0.0f }, { 100.0f, 100.0f }, { 200.0f, 300.0f }, { 300.0f, 600.0f }, { 0.0f, 700.0f } }, 0xFFFFFF);
 			}
 			
 			w1.graphics.DrawCrosshair();
