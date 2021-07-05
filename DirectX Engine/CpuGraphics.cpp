@@ -104,16 +104,14 @@ void CpuGraphics::DrawTriangleFlatBottom(const Vec2f& v0, const Vec2f& v1, const
 	float outLeft = std::clamp(-v0.y / vLeft.y, 0.f, 1.f);
 	float outRight = std::clamp(-v0.y / vRight.y, 0.f, 1.f);
 
-	//Vec2f v0Left = { v0.x + vLeft.x * outLeft, v0.y + vLeft.y * outLeft };
-	//Vec2f v0Right = { v0.x + vRight.x * outRight, v0.y + vRight.y * outRight };
+	int yStart = std::clamp((int)round(v0.y), 0, bufferHeight);
+	int yEnd = std::clamp((int)ceil(v2.y - 0.5f), 0, bufferHeight);
 
-	float t;
 	// Might be miscalculation in (0.5f - modf(v0.y, &t)) if y < 0
-	float xLeft = v0.x + vLeft.x * outLeft + dxLeft * modf(0.5f - v0.y, &t);
-	float xRight = v0.x + vRight.x * outRight + dxRight * modf(0.5f - v0.y, &t);
+	float xLeft = v0.x + vLeft.x * outLeft + dxLeft * (0.5f - v0.y + float(yStart));
+	float xRight = v0.x + vRight.x * outRight + dxRight * (0.5f - v0.y + float(yStart));
 	
-	int yStart = std::clamp((int)ceil(v0.y - 0.5f), 0, bufferHeight);
-	int yEnd =   std::clamp((int)ceil(v2.y - 0.5f), 0, bufferHeight);
+
 	int index = yStart * bufferWidth;
 
 	for (int y = yStart; y < yEnd; y++)
@@ -139,13 +137,15 @@ void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Ve
 	float outLeft = std::clamp(-v0.y / vLeft.y, 0.f, 1.f);
 	float outRight = std::clamp(-v1.y / vRight.y, 0.f, 1.f);
 
+	int yStart = std::clamp((int)ceil(v0.y - 0.5f), 0, bufferHeight);
+	int yEnd = std::clamp((int)ceil(v2.y - 0.5f), 0, bufferHeight);
+
 	float t;
 	// Might be miscalculation in (0.5f - modf(v0|v1.y, &t)) if y < 0
-	float xLeft = v0.x + vLeft.x * outLeft + dxLeft * modf(0.5f + v0.y, &t);
-	float xRight = v1.x + vRight.x * outRight + dxRight * modf(0.5f + v1.y, &t);
+	float xLeft = v0.x + vLeft.x * outLeft + dxLeft * modf(0.5f - v0.y + float(yStart), &t);
+	float xRight = v1.x + vRight.x * outRight + dxRight * modf(0.5f - v0.y + float(yStart), &t);
 
-	int yStart = std::clamp((int)ceil(v0.y - 0.5f), 0, bufferHeight);
-	int yEnd =   std::clamp((int)ceil(v2.y - 0.5f), 0, bufferHeight);
+
 	int index = yStart * bufferWidth;
 
 	for (int y = yStart; y < yEnd; y++)
@@ -160,10 +160,10 @@ void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Ve
 	}
 }
 
-void CpuGraphics::DrawProjectionTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, unsigned int color)
+void CpuGraphics::DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, unsigned int color)
 {
 	// Backface culling
-	//if ((v1 - v0).Cross(v2 - v0).Dot(v0 - cameraPos) < 0)
+	if ((v1 - v0).Cross(v2 - v0).Dot(v0 - cameraPos) < 0)
 	{
 		Vec2f val0;
 		Vec2f val1;
@@ -190,6 +190,33 @@ void CpuGraphics::DrawRect(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, co
 {
 	DrawTriangle(v0, v1, v2, color);
 	DrawTriangle(v0, v2, v3, color);
+}
+
+void CpuGraphics::DrawCube(const Vec3f& p0, const Vec3f& p1, unsigned int color)
+{
+	auto dif = p1 - p0;
+	auto x = Vec3f(dif.x, 0.0f, 0.0f);
+	auto y = Vec3f(0.0f, dif.y, 0.0f);
+	auto z = Vec3f(0.0f, 0.0f, dif.z);
+
+	DrawTriangle(p0, p0 + x + y, p0 + x, color);
+	DrawTriangle(p0, p0 + y, p0 + x + y, color);
+
+	DrawTriangle(p0, p0 + x, p0 + x + z, color);
+	DrawTriangle(p0, p0 + x + z, p0 + z, color);
+
+	DrawTriangle(p0, p0 + y + z, p0 + y, color);
+	DrawTriangle(p0, p0 + z, p0 + y + z, color);
+
+
+	//DrawTriangle(p1, p1 - x - y, p1 - x, color);
+	//DrawTriangle(p1, p1 - y, p1 - x - y, color);
+
+	//DrawTriangle(p1, p1 - x, p1 - x - z, color);
+	//DrawTriangle(p1, p1 - x - z, p1 - z, color);
+
+	//DrawTriangle(p1, p1 - y - z, p1 - y, color);
+	//DrawTriangle(p1, p1 - z, p1 - y - z, color);
 }
 
 void CpuGraphics::DrawCrosshair()

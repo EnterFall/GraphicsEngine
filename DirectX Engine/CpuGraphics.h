@@ -43,8 +43,9 @@ public:
 	void SetPixel(int x, int y, byte r, byte g, byte b);
 	void DrawRect(int x0, int y0, int x1, int y1, unsigned int color);
 	void DrawTriangle(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, unsigned int color);
-	void DrawProjectionTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, unsigned int color);
+	void DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, unsigned int color);
 	void DrawRect(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, const Vec2f& v3, unsigned int color);
+	void DrawCube(const Vec3f& p0, const Vec3f& p1, unsigned int color);
 	void DrawCrosshair();
 
 	Vec2f Transform(const Vec3f& camPos, const Vec3f& cam, const Vec3f& vertex) const;
