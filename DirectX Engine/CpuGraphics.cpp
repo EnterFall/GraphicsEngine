@@ -203,7 +203,7 @@ void CpuGraphics::DrawCube(const Vec3f& p0, const Vec3f& p1, unsigned int color)
 	auto x = Vec3f(dif.x, 0.0f, 0.0f);
 	auto y = Vec3f(0.0f, dif.y, 0.0f);
 	auto z = Vec3f(0.0f, 0.0f, dif.z);
-
+	// Not optimized
 	DrawTriangle(p0, p0 + x + y, p0 + x, color);
 	DrawTriangle(p0, p0 + y, p0 + x + y, color);
 
@@ -214,14 +214,14 @@ void CpuGraphics::DrawCube(const Vec3f& p0, const Vec3f& p1, unsigned int color)
 	DrawTriangle(p0, p0 + z, p0 + y + z, color);
 
 
-	//DrawTriangle(p1, p1 - x - y, p1 - x, color);
-	//DrawTriangle(p1, p1 - y, p1 - x - y, color);
+	DrawTriangle(p1, p1 - x, p1 - x - y, color);
+	DrawTriangle(p1, p1 - x - y, p1 - y, color);
 
-	//DrawTriangle(p1, p1 - x, p1 - x - z, color);
-	//DrawTriangle(p1, p1 - x - z, p1 - z, color);
+	DrawTriangle(p1, p1 - x - z, p1 - x, color);
+	DrawTriangle(p1, p1 - z, p1 - x - z, color);
 
-	//DrawTriangle(p1, p1 - y - z, p1 - y, color);
-	//DrawTriangle(p1, p1 - z, p1 - y - z, color);
+	DrawTriangle(p1, p1 - y, p1 - y - z, color);
+	DrawTriangle(p1, p1 - y - z, p1 - z, color);
 }
 
 void CpuGraphics::DrawCrosshair()
