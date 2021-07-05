@@ -3,7 +3,7 @@
 #include "Vec3f.h"
 #include "Matrix3.h"
 #include "EFWin.h"
-#include "MathHelper.h";
+#include "MathHelper.h"
 #include <memory>
 #include <algorithm>
 #include <cmath>

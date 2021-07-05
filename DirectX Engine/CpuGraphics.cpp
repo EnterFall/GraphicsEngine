@@ -107,9 +107,12 @@ void CpuGraphics::DrawTriangleFlatBottom(const Vec2f& v0, const Vec2f& v1, const
 	int yStart = std::clamp((int)round(v0.y), 0, bufferHeight);
 	int yEnd = std::clamp((int)ceil(v2.y - 0.5f), 0, bufferHeight);
 
-	// Might be miscalculation in (0.5f - modf(v0.y, &t)) if y < 0
-	float xLeft = v0.x + vLeft.x * outLeft + dxLeft * (0.5f - v0.y + float(yStart));
-	float xRight = v0.x + vRight.x * outRight + dxRight * (0.5f - v0.y + float(yStart));
+	// if y < 0, start vectors will be corrected
+	auto leftCorr = v0 + vLeft * outLeft;
+	auto rightCorr = v0 + vRight * outRight;
+
+	float xLeft = leftCorr.x + dxLeft * (0.5f - leftCorr.y + float(yStart));
+	float xRight = rightCorr.x + dxRight * (0.5f - rightCorr.y + float(yStart));
 	
 
 	int index = yStart * bufferWidth;
@@ -140,11 +143,13 @@ void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Ve
 	int yStart = std::clamp((int)ceil(v0.y - 0.5f), 0, bufferHeight);
 	int yEnd = std::clamp((int)ceil(v2.y - 0.5f), 0, bufferHeight);
 
-	float t;
-	// Might be miscalculation in (0.5f - modf(v0|v1.y, &t)) if y < 0
-	float xLeft = v0.x + vLeft.x * outLeft + dxLeft * modf(0.5f - v0.y + float(yStart), &t);
-	float xRight = v1.x + vRight.x * outRight + dxRight * modf(0.5f - v0.y + float(yStart), &t);
+	// if y < 0, start vectors will be corrected
+	auto leftCorr = v0 + vLeft * outLeft;
+	auto rightCorr = v1 + vRight * outRight;
 
+	float t;
+	float xLeft = leftCorr.x + dxLeft * modf(0.5f - leftCorr.y + float(yStart), &t);
+	float xRight = rightCorr.x + dxRight * modf(0.5f - rightCorr.y + float(yStart), &t);
 
 	int index = yStart * bufferWidth;
 

@@ -14,11 +14,16 @@ struct Vec2f
 
 	Vec2f operator+(const Vec2f& r) const
 	{
-		return Vec2f{ this->x + r.x, this->y + r.y };
+		return Vec2f{ x + r.x, y + r.y };
 	}
 
 	Vec2f operator-(const Vec2f& r) const
 	{
-		return Vec2f{ this->x - r.x, this->y - r.y };
+		return Vec2f{ x - r.x, y - r.y };
+	}
+
+	Vec2f operator*(const float& val) const
+	{
+		return Vec2f{ x * val, y * val };
 	}
 };
