@@ -93,6 +93,7 @@ void CpuGraphics::DrawTriangle(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2
 	}
 }
 
+// Sometimes pixel holes appear (
 void CpuGraphics::DrawTriangleFlatBottom(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, unsigned int color)
 {
 	Vec2f vLeft = v1 - v0;
@@ -129,6 +130,7 @@ void CpuGraphics::DrawTriangleFlatBottom(const Vec2f& v0, const Vec2f& v1, const
 	}
 }
 
+// Sometimes pixel holes appear (
 void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, unsigned int color)
 {
 	Vec2f vLeft = v2 - v0;
@@ -167,8 +169,8 @@ void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Ve
 
 void CpuGraphics::DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, unsigned int color)
 {
-	// Backface culling
-	if ((v1 - v0).Cross(v2 - v0).Dot(v0 - cameraPos) < 0)
+	// Backface culling, triangle in clockwise order is visible
+	if ((v1 - v0).Cross(v2 - v0).Dot(v0 - cameraPos) > 0)
 	{
 		Vec2f val0;
 		Vec2f val1;
