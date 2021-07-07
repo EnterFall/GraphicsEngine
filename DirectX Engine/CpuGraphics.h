@@ -4,6 +4,7 @@
 #include "Matrix3.h"
 #include "EFWin.h"
 #include "MathHelper.h"
+#include "Camera.h"
 #include <memory>
 #include <algorithm>
 #include <cmath>
@@ -14,20 +15,12 @@ class CpuGraphics
 public:
 	const int bufferWidth = 1920;
 	const int bufferHeight = 1080;
-	const float fovLen = 800;
-
-	const float fovScalar = 1.0f / (fovLen * fovLen);
-
-	Vec3f cameraPos = Vec3f(0.0f, 0.0f, 0.0f);
-	Vec3f cameraX90 = Vec3f(1.0f, 0.0f, 0.0f);
-	Vec3f cameraY90 = Vec3f(0.0f, 1.0f, 0.0f);
-	Vec3f cameraZ90 = Vec3f(0.0f, 0.0f, 1.0f);
-	Vec3f cameraDirection = Vec3f(0.0f, 0.0f, 1.0f);
-	Matrix3f transform;
+	const float fov = MathHelper::PI_2_f;
 
 	float travelSpeed = 4.0f;
 	bool isMatrixTransform = true;
 	
+	Camera camera = Camera(bufferWidth, bufferHeight, fov);
 	
 private:
 	std::shared_ptr<int[]> screenBuffer;
@@ -49,7 +42,7 @@ public:
 	void DrawPoligon(const std::initializer_list<Vec2f>& points, unsigned int color);
 	void DrawCrosshair();
 
-	Vec2f Transform(const Vec3f& camPos, const Vec3f& cam, const Vec3f& vertex) const;
+	Vec2f Transform(const Vec3f& vertex) const;
 	Vec2f TransformByMatrix(const Vec3f& vertex) const;
 private:
 	void DrawTriangleFlatBottom(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, unsigned int color);

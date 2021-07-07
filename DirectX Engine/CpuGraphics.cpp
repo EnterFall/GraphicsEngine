@@ -170,7 +170,8 @@ void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Ve
 void CpuGraphics::DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, unsigned int color)
 {
 	// Backface culling, triangle in clockwise order is visible
-	if ((v1 - v0).Cross(v2 - v0).Dot(v0 - cameraPos) > 0)
+	// > 0 cuz y is downwards
+	if ((v1 - v0).Cross(v2 - v0).Dot(v0 - camera.pos) > 0)
 	{
 		Vec2f val0;
 		Vec2f val1;
@@ -183,9 +184,9 @@ void CpuGraphics::DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2
 		}
 		else
 		{
-			val0 = Transform(cameraPos, cameraDirection, v0);
-			val1 = Transform(cameraPos, cameraDirection, v1);
-			val2 = Transform(cameraPos, cameraDirection, v2);
+			val0 = Transform(v0);
+			val1 = Transform(v1);
+			val2 = Transform(v2);
 		}
 
 
@@ -256,24 +257,27 @@ void CpuGraphics::DrawCrosshair()
 }
 
 // Z value is not computed
-Vec2f CpuGraphics::Transform(const Vec3f& camPos, const Vec3f& cam, const Vec3f& vertex) const
+Vec2f CpuGraphics::Transform(const Vec3f& vertex) const
 {
-	Vec3f camToVert = vertex - camPos;
+	Vec3f camToVert = vertex - camera.pos;
 
-	// projScale = (camToVert.Length() * cameraDirection.Cos(camToVert)) / cameraDirection.Length();
-	auto projScale = cameraDirection.Dot(camToVert) * fovScalar;
+	auto projX = camera.X90.Dot(camToVert);
+	auto projY = camera.Y90.Dot(camToVert);
+	auto projZ = camera.Z90.Dot(camToVert);
 
-	auto projX = cameraX90.Dot(camToVert);
-	auto projY = cameraY90.Dot(camToVert);
+	auto scaleX = camera.scaleX / projZ;
+	auto scaleY = camera.scaleY / projZ;
 
-	return Vec2f((bufferWidth >> 1) + projX / projScale, (bufferHeight >> 1) + projY / projScale);
+	return Vec2f((bufferWidth >> 1) + projX * scaleX, (bufferHeight >> 1) + projY * scaleY);
 }
 
 Vec2f CpuGraphics::TransformByMatrix(const Vec3f& vertex) const
 {
-	Vec3f camToVert = vertex - cameraPos;
-	auto projScale = cameraDirection.Dot(camToVert) * fovScalar;
+	Vec3f camToVert = vertex - camera.pos;
+	auto proj = camera.transform.Mult(camToVert);
 
-	auto proj = transform.Mult(camToVert) / projScale;
-	return Vec2f((bufferWidth >> 1) + proj.x, (bufferHeight >> 1) + proj.y);
+	auto scaleX = camera.scaleX / proj.z;
+	auto scaleY = camera.scaleY / proj.z;
+
+	return Vec2f((bufferWidth >> 1) + proj.x * scaleX, (bufferHeight >> 1) + proj.y * scaleY);
 }

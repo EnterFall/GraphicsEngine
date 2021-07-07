@@ -167,6 +167,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CpuGraphics.cpp" />
     <ClCompile Include="EFException.cpp" />
     <ClCompile Include="Keyboard.cpp" />
@@ -174,6 +175,7 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="CpuGraphics.h" />
     <ClInclude Include="EFException.h" />
     <ClInclude Include="EFWin.h" />

@@ -37,27 +37,27 @@ int WINAPI WinMain(
 			}
 			if (w1.keyboard.IsPressed('W'))
 			{
-				w1.graphics.cameraPos = w1.graphics.cameraPos + (w1.graphics.cameraZ90 * w1.graphics.travelSpeed);
+				w1.graphics.camera.pos = w1.graphics.camera.pos + (w1.graphics.camera.Z90 * w1.graphics.travelSpeed);
 			}
 			if (w1.keyboard.IsPressed('S'))
 			{
-				w1.graphics.cameraPos = w1.graphics.cameraPos - (w1.graphics.cameraZ90 * w1.graphics.travelSpeed);
+				w1.graphics.camera.pos = w1.graphics.camera.pos - (w1.graphics.camera.Z90 * w1.graphics.travelSpeed);
 			}
 			if (w1.keyboard.IsPressed('D'))
 			{
-				w1.graphics.cameraPos = w1.graphics.cameraPos + (w1.graphics.cameraX90 * w1.graphics.travelSpeed);
+				w1.graphics.camera.pos = w1.graphics.camera.pos + (w1.graphics.camera.X90 * w1.graphics.travelSpeed);
 			}
 			if (w1.keyboard.IsPressed('A'))
 			{
-				w1.graphics.cameraPos = w1.graphics.cameraPos - (w1.graphics.cameraX90 * w1.graphics.travelSpeed);
+				w1.graphics.camera.pos = w1.graphics.camera.pos - (w1.graphics.camera.X90 * w1.graphics.travelSpeed);
 			}
 			if (w1.keyboard.IsPressed(VK_SHIFT))
 			{
-				w1.graphics.cameraPos = w1.graphics.cameraPos + (w1.graphics.cameraY90 * w1.graphics.travelSpeed);
+				w1.graphics.camera.pos = w1.graphics.camera.pos + (w1.graphics.camera.Y90 * w1.graphics.travelSpeed);
 			}
 			if (w1.keyboard.IsPressed(VK_SPACE))
 			{
-				w1.graphics.cameraPos = w1.graphics.cameraPos - (w1.graphics.cameraY90 * w1.graphics.travelSpeed);
+				w1.graphics.camera.pos = w1.graphics.camera.pos - (w1.graphics.camera.Y90 * w1.graphics.travelSpeed);
 			}
 
 
@@ -75,20 +75,7 @@ int WINAPI WinMain(
 			float x = (e.x - w1.graphics.bufferWidth / 2) / (float)w1.graphics.bufferHeight * MathHelper::PIMul2_f;
 			float y = (e.y - w1.graphics.bufferHeight / 2) / (float)w1.graphics.bufferHeight * MathHelper::PIMul2_f;
 
-			w1.graphics.cameraZ90 = Vec3f(cos(y) * sin(x), sin(y), cos(y) * cos(x));
- 			w1.graphics.cameraY90 = Vec3f(cos(y + MathHelper::PI_2_f) * sin(x), sin(y + MathHelper::PI_2_f), cos(y + MathHelper::PI_2_f) * cos(x));
-			w1.graphics.cameraX90 = w1.graphics.cameraY90.Cross(w1.graphics.cameraZ90);
-
-			auto aef = w1.graphics.cameraDirection.Cos(w1.graphics.cameraY90);
-			auto aef2 = w1.graphics.cameraY90.Cos(w1.graphics.cameraX90);
-			auto aef3 = w1.graphics.cameraX90.Cos(w1.graphics.cameraZ90);
-
-			auto m = Matrix3f(w1.graphics.cameraX90, w1.graphics.cameraY90, w1.graphics.cameraZ90);
-			w1.graphics.transform = m.Inverse2();
-
-			auto ere = m.Mult(w1.graphics.transform);
-
-			w1.graphics.cameraDirection = w1.graphics.cameraZ90 * w1.graphics.fovLen;
+			w1.graphics.camera.Rotate(x, y);
 
 			//w1.DrawRect(100, 100, 200, 200, (unsigned int)a % 256);
 			w1.graphics.Clear();
@@ -104,8 +91,11 @@ int WINAPI WinMain(
 				//g.DrawTriangle({ 2500.0f, 1400.0f }, { 1076.5f, 200.5f }, { 200.5f, 576.5f }, 0xFFFFFF);
 				//g.DrawTriangle({ -100.0f, -500.0f }, { -500.0f, -100.0f }, { 300.0f, 300.0f }, 0xFFFFFF);
 				
-				w1.graphics.DrawTriangle({ 0.0f, 100.0f, 500.0f }, { 200.0f, 0.0f, 500.0f }, { 200.0f, 200.0f, 500.0f }, 0xFFFFFF);
-				
+				//w1.graphics.DrawTriangle({ 0.0f, 1080.0f / 2, 500.0f }, { 0.0f, 0.0f, 500.0f }, { 1920.0f / 2, 0.0f, 500.0f }, 0xFFFFFF);
+				//w1.graphics.DrawTriangle({ 0.0f, 1080.0f / 2, 500.0f }, { 1920.0f / 2, 0.0f, 500.0f }, { 1920.0f / 2, 1080.0f / 2, 500.0f }, 0xFFFFFF);
+
+				w1.graphics.DrawTriangle({ 0.0f, 0.0f, 500.0f }, { 200.0f, 100.0f, 500.0f }, { 0.0f, 200.0f, 500.0f }, 0xFFFFFF);
+
 				//w1.graphics.DrawCube({ 0.0f, 0.0f, 0.0f }, { 100.0f, 100.0f, 100.0f }, 0xFFFFFF);
 
 				//w1.graphics.DrawPoligon({ { 0.0f, 0.0f }, { 100.0f, 100.0f }, { 200.0f, 300.0f }, { 300.0f, 600.0f }, { 0.0f, 700.0f } }, 0xFFFFFF);

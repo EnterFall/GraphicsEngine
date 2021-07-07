@@ -14,7 +14,13 @@ struct Matrix3
 	T p21;
 	T p22;
 
-	Matrix3() = default;
+	Matrix3() :
+		p00(1.0f), p01(0.0f), p02(0.0f),
+		p10(0.0f), p11(1.0f), p12(0.0f),
+		p20(0.0f), p21(0.0f), p22(1.0f)
+	{
+
+	}
 
 	Matrix3(T x00, T x01, T x02, T x10, T x11, T x12, T x20, T x21, T x22) :
 		p00(x00), p10(x10), p20(x20),
