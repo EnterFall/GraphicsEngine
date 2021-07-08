@@ -2,10 +2,12 @@
 
 Camera::Camera(int width, int height, float fov)
 {
+	widthHalf = width >> 1;
+	heightHalf = height >> 1;
 	fovW = fov;
-	scaleX = (width >> 1) / tan(fovW / 2.0f);
-	fovH = atan((height >> 1) / scaleX) * 2;
-	scaleY = (height >> 1) / tan(fovH / 2.0f);
+	scaleX = widthHalf / tan(fovW / 2.0f);
+	fovH = atan(heightHalf / scaleX) * 2;
+	scaleY = heightHalf / tan(fovH / 2.0f);
 
 	float rotFovW = MathHelper::PI_2_f - fovW / 2.0f;
 	float rotFovH = MathHelper::PI_2_f - fovH / 2.0f;

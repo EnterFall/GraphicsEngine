@@ -170,12 +170,11 @@ void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Ve
 void CpuGraphics::DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, unsigned int color)
 {
 	// Backface culling, triangle in clockwise order is visible
-	// > 0 cuz y is downwards
-	if ((v1 - v0).Cross(v2 - v0).Dot(v0 - camera.pos) > 0)
+	if ((v1 - v0).Cross(v2 - v0).Dot(v0 - camera.pos) < 0)
 	{
-		Vec2f val0;
-		Vec2f val1;
-		Vec2f val2;
+		Vec3f val0;
+		Vec3f val1;
+		Vec3f val2;
 		if (isMatrixTransform)
 		{
 			val0 = TransformByMatrix(v0);
@@ -188,9 +187,53 @@ void CpuGraphics::DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2
 			val1 = Transform(v1);
 			val2 = Transform(v2);
 		}
+		std::vector<Vec2f> bVertex = std::vector<Vec2f>();
+
+		Clip(&bVertex, val0, val1);
+		Clip(&bVertex, val1, val2);
+		Clip(&bVertex, val2, val0);
+
+		DrawPoligon(bVertex.begin()._Ptr, bVertex.size(), color);
+		//DrawTriangle(val0, val1, val2, color);
+	}
+}
+
+Vec2f CpuGraphics::ToVec2(Vec3f v)
+{
+	auto scaleX = camera.scaleX / abs(v.z);
+	auto scaleY = camera.scaleY / abs(v.z);
+	return Vec2f((bufferWidth >> 1) + v.x * scaleX, (bufferHeight >> 1) - v.y * scaleY);
+}
+
+// Only Z clipping
+void CpuGraphics::Clip(std::vector<Vec2f>* list, const Vec3f& v0, const Vec3f& v1)
+{
+	float zClip = 1.0f;
+
+	const Vec3f* p0 = &v0;
+	const Vec3f* p1 = &v1;
 
 
-		DrawTriangle(val0, val1, val2, color);
+	if (p0->z < zClip && p1->z > zClip)
+	{
+		float scale = (zClip - p0->z) / (p1->z - p0->z);
+		auto corr = *p0 + ((*p1 - *p0) * scale);
+
+		list->push_back(ToVec2(corr));
+		list->push_back(ToVec2(*p1));
+	}
+	else if (p0->z > zClip && p1->z < zClip)
+	{
+		float scale = (zClip - p1->z) / (p0->z - p1->z);
+		auto corr = *p1 + ((*p0 - *p1) * scale);
+
+		list->push_back(ToVec2(*p0));
+		list->push_back(ToVec2(corr));
+	}
+	else if (p0->z > zClip && p1->z > zClip)
+	{
+		list->push_back(ToVec2(*p0));
+		list->push_back(ToVec2(*p1));
 	}
 }
 
@@ -227,19 +270,17 @@ void CpuGraphics::DrawCube(const Vec3f& p0, const Vec3f& p1, unsigned int color)
 	DrawTriangle(p1, p1 - y - z, p1 - z, color);
 }
 
-void CpuGraphics::DrawPoligon(const std::initializer_list<Vec2f>& points, unsigned int color)
+void CpuGraphics::DrawPoligon(Vec2f* points, size_t count, unsigned int color)
 {
-	auto pointsArr = points.begin();
-	auto v0 = pointsArr;
-	auto v1 = pointsArr + 1;
-	auto v2 = pointsArr + 2;
-	int size = points.size();
+	auto v0 = points;
+	auto v1 = points + 1;
+	auto v2 = points + 2;
 	int i = 2;
-	while (i < size)
+	while (i < count)
 	{
 		DrawTriangle(*v0, *v1, *v2, color);
 		v1 = v2;
-		v2 = pointsArr + 1 + i;
+		v2 = points + 1 + i;
 		i++;
 	}
 }
@@ -256,8 +297,7 @@ void CpuGraphics::DrawCrosshair()
 	}
 }
 
-// Z value is not computed
-Vec2f CpuGraphics::Transform(const Vec3f& vertex) const
+Vec3f CpuGraphics::Transform(const Vec3f& vertex) const
 {
 	Vec3f camToVert = vertex - camera.pos;
 
@@ -265,19 +305,11 @@ Vec2f CpuGraphics::Transform(const Vec3f& vertex) const
 	auto projY = camera.Y90.Dot(camToVert);
 	auto projZ = camera.Z90.Dot(camToVert);
 
-	auto scaleX = camera.scaleX / projZ;
-	auto scaleY = camera.scaleY / projZ;
-
-	return Vec2f((bufferWidth >> 1) + projX * scaleX, (bufferHeight >> 1) + projY * scaleY);
+	return Vec3f(projX, projY, projZ);
 }
 
-Vec2f CpuGraphics::TransformByMatrix(const Vec3f& vertex) const
+Vec3f CpuGraphics::TransformByMatrix(const Vec3f& vertex) const
 {
 	Vec3f camToVert = vertex - camera.pos;
-	auto proj = camera.transform.Mult(camToVert);
-
-	auto scaleX = camera.scaleX / proj.z;
-	auto scaleY = camera.scaleY / proj.z;
-
-	return Vec2f((bufferWidth >> 1) + proj.x * scaleX, (bufferHeight >> 1) + proj.y * scaleY);
+	return camera.transform.Mult(camToVert);
 }

@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <vector>
 
 class CpuGraphics
 {
@@ -21,7 +22,6 @@ public:
 	bool isMatrixTransform = true;
 	
 	Camera camera = Camera(bufferWidth, bufferHeight, fov);
-	
 private:
 	std::shared_ptr<int[]> screenBuffer;
 	BITMAPINFO bufferInfo;
@@ -37,15 +37,17 @@ public:
 	void DrawRect(int x0, int y0, int x1, int y1, unsigned int color);
 	void DrawTriangle(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, unsigned int color);
 	void DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, unsigned int color);
+	Vec2f ToVec2(Vec3f v);
 	void DrawRect(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, const Vec2f& v3, unsigned int color);
 	void DrawCube(const Vec3f& p0, const Vec3f& p1, unsigned int color);
-	void DrawPoligon(const std::initializer_list<Vec2f>& points, unsigned int color);
+	void DrawPoligon(Vec2f* points, size_t count, unsigned int color);
 	void DrawCrosshair();
 
-	Vec2f Transform(const Vec3f& vertex) const;
-	Vec2f TransformByMatrix(const Vec3f& vertex) const;
+	Vec3f Transform(const Vec3f& vertex) const;
+	Vec3f TransformByMatrix(const Vec3f& vertex) const;
 private:
 	void DrawTriangleFlatBottom(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, unsigned int color);
 	void DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, unsigned int color);
+	void Clip(std::vector<Vec2f>* list, const Vec3f& v0, const Vec3f& v1);
 };
 
