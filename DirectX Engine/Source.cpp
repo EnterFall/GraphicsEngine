@@ -69,17 +69,17 @@ int WINAPI WinMain(
 			if (!GetCursorPos(&e))
 				throw WindowExceptLastError();
 
-			float x = (e.x - w1.graphics.bufferWidth / 2) / (float)w1.graphics.bufferHeight * MathHelper::PIMul2_f;
-			float y = -(e.y - w1.graphics.bufferHeight / 2) / (float)w1.graphics.bufferHeight * MathHelper::PIMul2_f;
+			float x = (e.x - w1.graphics.widthHalf) / (float)w1.graphics.bufferHeight * MathHelper::PIMul2_f;
+			float y = -(e.y - w1.graphics.heightHalf) / (float)w1.graphics.bufferHeight * MathHelper::PIMul2_f;
 
 			w1.graphics.camera.Rotate(x, y);
 
 			w1.graphics.Clear();
 			for (size_t i = 0; i < 1; i++)
 			{
-				w1.graphics.DrawTriangle({ 0.0f, 0.0f, 500.0f }, { 0.0f, 200.0f, 500.0f }, { 5000.0f, 100.0f, 500.0f }, 0xFF0000);
+				w1.graphics.DrawTriangle({ 0.0f, 0.0f, 500.0f }, { 0.0f, 200.0f, 500.0f }, { 5000.0f, 100.0f, 500.0f }, Colors::Red);
 
-				w1.graphics.DrawCube({ 0.0f, 0.0f, 0.0f }, { 1000.0f, 1000.0f, 1000.0f }, 0xFFFFFF);
+				w1.graphics.DrawCube({ 0.0f, 0.0f, 0.0f }, { 1000.0f, 1000.0f, 1000.0f }, Colors::White);
 
 				//w1.graphics.DrawPoligon({ { 0.0f, 0.0f }, { 100.0f, 100.0f }, { 200.0f, 300.0f }, { 300.0f, 600.0f }, { 0.0f, 700.0f } }, 0xFFFFFF);
 			}

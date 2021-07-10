@@ -2,13 +2,14 @@
 
 CpuGraphics::CpuGraphics()
 {
-	screenBuffer = std::make_shared<int[]>(bufferWidth * bufferHeight);
+	screenBuffer = std::make_shared<Color[]>(bufferWidth * bufferHeight);
+	clipBuffer = std::vector<Vec2f>(6);
 
 	for (int y = 0; y < bufferHeight; y++)
 	{
 		for (int x = 0; x < bufferWidth; x++)
 		{
-			screenBuffer[y * bufferWidth + x] = RGB(x, y, 0);
+			screenBuffer[y * bufferWidth + x] = Color(x, y, 0);
 		}
 	}
 
@@ -21,7 +22,7 @@ CpuGraphics::CpuGraphics()
 	bufferInfo.bmiHeader.biCompression = BI_RGB;
 }
 
-int* CpuGraphics::GetBuffer() const
+Color* CpuGraphics::GetScreenBuffer() const
 {
 	return screenBuffer.get();
 }
@@ -34,23 +35,22 @@ const BITMAPINFO& CpuGraphics::GetBufferInfo() const
 // Slow 
 void CpuGraphics::Clear()
 {
-
 	for (int y = 0; y < bufferHeight; y++)
 	{
 		for (int x = 0; x < bufferWidth; x++)
 		{
-			screenBuffer[y * bufferWidth + x] = 0x000000;
+			screenBuffer[y * bufferWidth + x] = Colors::Black;
 		}
 	}
 }
 
 
-void CpuGraphics::SetPixel(int x, int y, byte r, byte g, byte b)
+void CpuGraphics::SetPixel(int x, int y, Color color)
 {
-	screenBuffer[y, x] = ((COLORREF)(((BYTE)(b) | ((WORD)((BYTE)(g)) << 8)) | (((DWORD)(BYTE)(r)) << 16)));
+	screenBuffer[y, x] = color;
 }
 
-void CpuGraphics::DrawRect(int x0, int y0, int x1, int y1, unsigned int color)
+void CpuGraphics::DrawRect(int x0, int y0, int x1, int y1, Color color)
 {
 	for (int y = y0; y < y1; y++)
 	{
@@ -59,10 +59,9 @@ void CpuGraphics::DrawRect(int x0, int y0, int x1, int y1, unsigned int color)
 			screenBuffer[y * bufferWidth + x] = color;
 		}
 	}
-	//StretchDIBits(hdc, 0, 0, width, height, 0, 0, width, height,  )
 }
 
-void CpuGraphics::DrawTriangle(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, unsigned int color)
+void CpuGraphics::DrawTriangle(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, Color color)
 {
 	const Vec2f* p0 = &v0;
 	const Vec2f* p1 = &v1;
@@ -94,7 +93,7 @@ void CpuGraphics::DrawTriangle(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2
 }
 
 // Sometimes pixel holes appear (
-void CpuGraphics::DrawTriangleFlatBottom(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, unsigned int color)
+void CpuGraphics::DrawTriangleFlatBottom(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, Color color)
 {
 	Vec2f vLeft = v1 - v0;
 	Vec2f vRight = v2 - v0;
@@ -131,7 +130,7 @@ void CpuGraphics::DrawTriangleFlatBottom(const Vec2f& v0, const Vec2f& v1, const
 }
 
 // Sometimes pixel holes appear (
-void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, unsigned int color)
+void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, Color color)
 {
 	Vec2f vLeft = v2 - v0;
 	Vec2f vRight = v2 - v1;
@@ -167,7 +166,7 @@ void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Ve
 	}
 }
 
-void CpuGraphics::DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, unsigned int color)
+void CpuGraphics::DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, Color color)
 {
 	// Backface culling, triangle in clockwise order is visible
 	if ((v1 - v0).Cross(v2 - v0).Dot(v0 - camera.pos) < 0)
@@ -187,22 +186,15 @@ void CpuGraphics::DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2
 			val1 = Transform(v1);
 			val2 = Transform(v2);
 		}
-		std::vector<Vec2f> bVertex = std::vector<Vec2f>();
 
-		Clip(&bVertex, val0, val1);
-		Clip(&bVertex, val1, val2);
-		Clip(&bVertex, val2, val0);
+		// if vertices not clipped, clipBuffer may contains same elements
+		Clip(&clipBuffer, val0, val1);
+		Clip(&clipBuffer, val1, val2);
+		Clip(&clipBuffer, val2, val0);
 
-		DrawPoligon(bVertex.begin()._Ptr, bVertex.size(), color);
-		//DrawTriangle(val0, val1, val2, color);
+		DrawPoligon(clipBuffer.begin()._Ptr, clipBuffer.size(), color);
+		clipBuffer.clear();
 	}
-}
-
-Vec2f CpuGraphics::ToVec2(Vec3f v)
-{
-	auto scaleX = camera.scaleX / abs(v.z);
-	auto scaleY = camera.scaleY / abs(v.z);
-	return Vec2f((bufferWidth >> 1) + v.x * scaleX, (bufferHeight >> 1) - v.y * scaleY);
 }
 
 // Only Z clipping
@@ -213,37 +205,36 @@ void CpuGraphics::Clip(std::vector<Vec2f>* list, const Vec3f& v0, const Vec3f& v
 	const Vec3f* p0 = &v0;
 	const Vec3f* p1 = &v1;
 
-
 	if (p0->z < zClip && p1->z > zClip)
 	{
 		float scale = (zClip - p0->z) / (p1->z - p0->z);
 		auto corr = *p0 + ((*p1 - *p0) * scale);
 
-		list->push_back(ToVec2(corr));
-		list->push_back(ToVec2(*p1));
+		list->push_back(camera.ToScreen(corr));
+		list->push_back(camera.ToScreen(*p1));
 	}
 	else if (p0->z > zClip && p1->z < zClip)
 	{
 		float scale = (zClip - p1->z) / (p0->z - p1->z);
 		auto corr = *p1 + ((*p0 - *p1) * scale);
 
-		list->push_back(ToVec2(*p0));
-		list->push_back(ToVec2(corr));
+		list->push_back(camera.ToScreen(*p0));
+		list->push_back(camera.ToScreen(corr));
 	}
 	else if (p0->z > zClip && p1->z > zClip)
 	{
-		list->push_back(ToVec2(*p0));
-		list->push_back(ToVec2(*p1));
+		list->push_back(camera.ToScreen(*p0));
+		list->push_back(camera.ToScreen(*p1));
 	}
 }
 
-void CpuGraphics::DrawRect(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, const Vec2f& v3, unsigned int color)
+void CpuGraphics::DrawRect(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, const Vec2f& v3, Color color)
 {
 	DrawTriangle(v0, v1, v2, color);
 	DrawTriangle(v0, v2, v3, color);
 }
 
-void CpuGraphics::DrawCube(const Vec3f& p0, const Vec3f& p1, unsigned int color)
+void CpuGraphics::DrawCube(const Vec3f& p0, const Vec3f& p1, Color color)
 {
 	auto dif = p1 - p0;
 	auto x = Vec3f(dif.x, 0.0f, 0.0f);
@@ -259,7 +250,6 @@ void CpuGraphics::DrawCube(const Vec3f& p0, const Vec3f& p1, unsigned int color)
 	DrawTriangle(p0, p0 + y + z, p0 + y, color);
 	DrawTriangle(p0, p0 + z, p0 + y + z, color);
 
-
 	DrawTriangle(p1, p1 - x, p1 - x - y, color);
 	DrawTriangle(p1, p1 - x - y, p1 - y, color);
 
@@ -270,7 +260,7 @@ void CpuGraphics::DrawCube(const Vec3f& p0, const Vec3f& p1, unsigned int color)
 	DrawTriangle(p1, p1 - y - z, p1 - z, color);
 }
 
-void CpuGraphics::DrawPoligon(Vec2f* points, size_t count, unsigned int color)
+void CpuGraphics::DrawPoligon(Vec2f* points, size_t count, Color color)
 {
 	auto v0 = points;
 	auto v1 = points + 1;
@@ -278,7 +268,10 @@ void CpuGraphics::DrawPoligon(Vec2f* points, size_t count, unsigned int color)
 	int i = 2;
 	while (i < count)
 	{
-		DrawTriangle(*v0, *v1, *v2, color);
+		if (*v1 != *v2)
+		{
+			DrawTriangle(*v0, *v1, *v2, color);
+		}
 		v1 = v2;
 		v2 = points + 1 + i;
 		i++;
@@ -288,11 +281,11 @@ void CpuGraphics::DrawPoligon(Vec2f* points, size_t count, unsigned int color)
 void CpuGraphics::DrawCrosshair()
 {
 	int offset = 10;
-	for (int y = bufferHeight / 2 - offset; y < bufferHeight / 2 + offset; y++)
+	for (int y = heightHalf - offset; y < heightHalf + offset; y++)
 	{
-		for (int x = bufferWidth / 2 - offset; x < bufferWidth / 2 + offset; x++)
+		for (int x = widthHalf - offset; x < widthHalf + offset; x++)
 		{
-			screenBuffer[y * bufferWidth + x] = 0x0000FF;
+			screenBuffer[y * bufferWidth + x] = Colors::Blue;
 		}
 	}
 }

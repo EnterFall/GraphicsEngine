@@ -4,6 +4,7 @@
 #include "Matrix3.h"
 #include "EFWin.h"
 #include "MathHelper.h"
+#include "Color.h"
 #include "Camera.h"
 #include <memory>
 #include <algorithm>
@@ -16,6 +17,10 @@ class CpuGraphics
 public:
 	const int bufferWidth = 1920;
 	const int bufferHeight = 1080;
+
+	float widthHalf = bufferWidth >> 1;
+	float heightHalf = bufferHeight >> 1;
+
 	const float fov = MathHelper::PI_2_f;
 
 	float travelSpeed = 4.0f;
@@ -23,31 +28,33 @@ public:
 	
 	Camera camera = Camera(bufferWidth, bufferHeight, fov);
 private:
-	std::shared_ptr<int[]> screenBuffer;
+	std::shared_ptr<Color[]> screenBuffer;
+	std::vector<Vec2f> clipBuffer;
 	BITMAPINFO bufferInfo;
 public:
 	CpuGraphics();
 
-	int* GetBuffer() const;
+	Color* GetScreenBuffer() const;
 	const BITMAPINFO& GetBufferInfo() const;
 
 	void Clear();
 	// Use SetPixel to draw is very slow
-	void SetPixel(int x, int y, byte r, byte g, byte b);
-	void DrawRect(int x0, int y0, int x1, int y1, unsigned int color);
-	void DrawTriangle(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, unsigned int color);
-	void DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, unsigned int color);
-	Vec2f ToVec2(Vec3f v);
-	void DrawRect(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, const Vec2f& v3, unsigned int color);
-	void DrawCube(const Vec3f& p0, const Vec3f& p1, unsigned int color);
-	void DrawPoligon(Vec2f* points, size_t count, unsigned int color);
+	void SetPixel(int x, int y, Color color);
+	void DrawRect(int x0, int y0, int x1, int y1, Color color);
+	void DrawTriangle(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, Color color);
+	void DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, Color color);
+	void DrawRect(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, const Vec2f& v3, Color color);
+	void DrawCube(const Vec3f& p0, const Vec3f& p1, Color color);
+	void DrawPoligon(Vec2f* points, size_t count, Color color);
 	void DrawCrosshair();
 
+
+private:
 	Vec3f Transform(const Vec3f& vertex) const;
 	Vec3f TransformByMatrix(const Vec3f& vertex) const;
-private:
-	void DrawTriangleFlatBottom(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, unsigned int color);
-	void DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, unsigned int color);
+
+	void DrawTriangleFlatBottom(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, Color color);
+	void DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, Color color);
 	void Clip(std::vector<Vec2f>* list, const Vec3f& v0, const Vec3f& v1);
 };
 

@@ -2,6 +2,7 @@
 #include "Vec3f.h"
 #include "Matrix3.h"
 #include "MathHelper.h"
+#include "Vec2f.h"
 
 class Camera
 {
@@ -26,6 +27,8 @@ public:
 	Camera(int width, int height, float fov);
 
 	void Rotate(float x, float y);
+
+	Vec2f ToScreen(const Vec3f& v) const;
 
 };
 

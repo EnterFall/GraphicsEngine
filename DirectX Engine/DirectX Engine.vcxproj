@@ -176,6 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Color.h" />
     <ClInclude Include="CpuGraphics.h" />
     <ClInclude Include="EFException.h" />
     <ClInclude Include="EFWin.h" />

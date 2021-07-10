@@ -109,7 +109,7 @@ void Window::UpdateScreen()
 	if (!ClientToScreen(hWnd, &location))
 		throw WindowExceptLastError();
 
-	if (!StretchDIBits(hdc, 0, 0, width, height, location.x, graphics.bufferHeight - location.y - height, width, height, graphics.GetBuffer(), &graphics.GetBufferInfo(), DIB_RGB_COLORS, SRCCOPY))
+	if (!StretchDIBits(hdc, 0, 0, width, height, location.x, graphics.bufferHeight - location.y - height, width, height, graphics.GetScreenBuffer(), &graphics.GetBufferInfo(), DIB_RGB_COLORS, SRCCOPY))
 		throw WindowExceptLastError();
 }
 
