@@ -186,6 +186,7 @@
     <ClInclude Include="Vec2f.h" />
     <ClInclude Include="Vec3f.h" />
     <ClInclude Include="Window.h" />
+    <ClInclude Include="ZBuffer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

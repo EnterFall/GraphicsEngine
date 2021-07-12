@@ -16,19 +16,15 @@ public:
 	Vec3f rightNormal;
 	Vec3f topNormal;
 	Vec3f bottomNormal;
-
 	float widthHalf;
 	float heightHalf;
 	float fovW;
 	float fovH;
 	float scaleX;
 	float scaleY;
-
+public:
 	Camera(int width, int height, float fov);
-
 	void Rotate(float x, float y);
-
 	Vec2f ToScreen(const Vec3f& v) const;
-
 };
 

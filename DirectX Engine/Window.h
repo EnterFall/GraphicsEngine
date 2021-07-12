@@ -11,15 +11,15 @@
 #define WindowExceptLastError() Window::Exception(__LINE__, __FILE__, GetLastError())
 class Window
 {
-private:
-	HWND hWnd;
-	HDC hdc;
 public:
 	int height;
 	int width;
 	CpuGraphics graphics;
 	Keyboard keyboard;
-
+private:
+	HWND hWnd;
+	HDC hdc;
+public:
 	class Exception : public EFException
 	{
 	private:
@@ -54,13 +54,10 @@ private:
 public:
 	Window(int width, int height, std::string title);
 	~Window();
-
 	HWND GetHWnd() const;
 	CpuGraphics& GetGraphics();
 	void SetTitle(const std::string& newTitle) const;
-	
 	void UpdateScreen();
-
 	Window(const Window&) = delete;
 	Window& operator =(const Window&) = delete;
 private:

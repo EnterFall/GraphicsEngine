@@ -15,7 +15,6 @@ public:
 	int GetLine() const;
 	std::string GetFile() const;
 	std::string GetString() const;
-	
 	const char* what() const override;
 	virtual std::string GetType() const;
 };
