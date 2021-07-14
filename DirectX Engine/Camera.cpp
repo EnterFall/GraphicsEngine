@@ -28,9 +28,9 @@ void Camera::Rotate(float x, float y)
 	transform = Matrix3f(X90, Y90, Z90).Inverse2();
 }
 
-Vec2f Camera::ToScreen(const Vec3f& v) const
+Vec3f Camera::ToScreen(const Vec3f& v) const
 {
 	auto projScaleX = scaleX / v.z;
 	auto projScaleY = scaleY / v.z;
-	return Vec2f(widthHalf + v.x * projScaleX, heightHalf - v.y * projScaleY);
+	return Vec3f(widthHalf + v.x * projScaleX, heightHalf - v.y * projScaleY, 1.0f / v.z);
 }

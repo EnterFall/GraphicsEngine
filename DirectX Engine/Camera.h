@@ -25,6 +25,6 @@ public:
 public:
 	Camera(int width, int height, float fov);
 	void Rotate(float x, float y);
-	Vec2f ToScreen(const Vec3f& v) const;
+	Vec3f ToScreen(const Vec3f& v) const;
 };
 

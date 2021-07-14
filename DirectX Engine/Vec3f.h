@@ -37,16 +37,44 @@ struct Vec3
 		return Vec3(x / other.x, y / other.y, z / other.z);
 	}
 
-	Vec3 operator *(const T& mul) const
+	Vec3 operator +(const T& val) const
 	{
-		return Vec3(x * mul, y * mul, z * mul);
+		return Vec3(x + val, y + val, z + val);
 	}
 
-	Vec3 operator /(const T& mul) const
+	Vec3 operator -(const T& val) const
 	{
-		return Vec3(x / mul, y / mul, z / mul);
+		return Vec3(x - val, y - val, z - val);
 	}
 
+	Vec3 operator *(const T& val) const
+	{
+		return Vec3(x * val, y * val, z * val);
+	}
+
+	Vec3 operator /(const T& val) const
+	{
+		T v = 1.0f / val;
+		return Vec3(x * v, y * v, z * v);
+	}
+
+	Vec3& operator +=(const T& val) const
+	{
+		x += val;
+		y += val;
+		z += val;
+		return *this;
+	}
+
+	bool operator ==(const Vec3& other) const
+	{
+		return x == other.x && y == other.y && z == other.z;
+	}
+
+	bool operator !=(const Vec3& other) const
+	{
+		return x != other.x || y != other.y || z != other.z;
+	}
 
 	Vec3 Cross(const Vec3& other) const
 	{
@@ -73,15 +101,15 @@ struct Vec3
 
 	T Cos(const Vec3& other) const
 	{
-		return Dot(other) / Length() / other.Length();
+		return Dot(other) / (Length() * other.Length());
 	}
 
 	void Normalize()
 	{
-		auto len = Length();
-		x /= len;
-		y /= len;
-		z /= len;
+		auto len = 1.0f / Length();
+		x *= len;
+		y *= len;
+		z *= len;
 	}
 };
 typedef Vec3<float> Vec3f;

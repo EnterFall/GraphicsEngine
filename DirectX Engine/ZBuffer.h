@@ -16,7 +16,7 @@ public:
 
 	bool Update(int index, float val)
 	{
-		if (val < buffer[index])
+		if (val > buffer[index])
 		{
 			buffer[index] = val;
 			return true;
@@ -26,6 +26,7 @@ public:
 
 	void Clear()
 	{
-		std::fill_n(buffer.get(), size, std::numeric_limits<float>::max());
+		//std::fill_n(buffer.get(), size, std::numeric_limits<float>::max());
+		std::fill_n(buffer.get(), size, 0.0f);
 	}
 };

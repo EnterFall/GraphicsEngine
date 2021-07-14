@@ -24,10 +24,10 @@ public:
 	float travelSpeed = 4.0f;
 	bool isMatrixTransform = true;
 	Camera camera = Camera(bufferWidth, bufferHeight, fov);
+	ZBuffer zBuffer = ZBuffer(bufferWidth * bufferHeight);
 private:
 	std::shared_ptr<Color[]> screenBuffer;
-	std::vector<Vec2f> clipBuffer;
-	ZBuffer zBuffer = ZBuffer(bufferWidth * bufferHeight);
+	std::vector<Vec3f> clipBuffer;
 	BITMAPINFO bufferInfo;
 public:
 	CpuGraphics();
@@ -37,17 +37,16 @@ public:
 	// Use SetPixel to draw is very slow
 	void SetPixel(int x, int y, Color color);
 	void DrawRect(int x0, int y0, int x1, int y1, Color color);
-	void DrawTriangle(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, Color color);
+	void DrawScreenTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, Color color);
 	void DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, Color color);
-	void DrawRect(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, const Vec2f& v3, Color color);
+	void DrawRect(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, const Vec3f& v3, Color color);
 	void DrawCube(const Vec3f& p0, const Vec3f& p1, Color color);
-	void DrawPoligon(Vec2f* points, size_t count, Color color);
+	void DrawPoligon(Vec3f* points, size_t count, Color color);
 	void DrawCrosshair();
 private:
 	Vec3f Transform(const Vec3f& vertex) const;
 	Vec3f TransformByMatrix(const Vec3f& vertex) const;
-	void DrawTriangleFlatBottom(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, Color color);
-	void DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, Color color);
-	void Clip(std::vector<Vec2f>* list, const Vec3f& v0, const Vec3f& v1);
+	void DrawTriangleFromTo(const Vec3f& leftS, const Vec3f& leftE, const Vec3f& rightS, const Vec3f& rightE, Color color);
+	void Clip(std::vector<Vec3f>* list, const Vec3f& v0, const Vec3f& v1);
 };
 

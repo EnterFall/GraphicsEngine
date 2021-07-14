@@ -29,6 +29,11 @@ int WINAPI WinMain(
 				DispatchMessage(&msg);
 			}
 			
+			float speed = w1.graphics.travelSpeed;
+			if (w1.keyboard.IsPressed('R'))
+			{
+				speed /= 10.0f;
+			}
 			if (w1.keyboard.IsPressed('B'))
 			{
 #ifdef _DEBUG
@@ -37,27 +42,27 @@ int WINAPI WinMain(
 			}
 			if (w1.keyboard.IsPressed('W'))
 			{
-				w1.graphics.camera.pos = w1.graphics.camera.pos + (w1.graphics.camera.Z90 * w1.graphics.travelSpeed);
+				w1.graphics.camera.pos = w1.graphics.camera.pos + (w1.graphics.camera.Z90 * speed);
 			}
 			if (w1.keyboard.IsPressed('S'))
 			{
-				w1.graphics.camera.pos = w1.graphics.camera.pos - (w1.graphics.camera.Z90 * w1.graphics.travelSpeed);
+				w1.graphics.camera.pos = w1.graphics.camera.pos - (w1.graphics.camera.Z90 * speed);
 			}
 			if (w1.keyboard.IsPressed('D'))
 			{
-				w1.graphics.camera.pos = w1.graphics.camera.pos + (w1.graphics.camera.X90 * w1.graphics.travelSpeed);
+				w1.graphics.camera.pos = w1.graphics.camera.pos + (w1.graphics.camera.X90 * speed);
 			}
 			if (w1.keyboard.IsPressed('A'))
 			{
-				w1.graphics.camera.pos = w1.graphics.camera.pos - (w1.graphics.camera.X90 * w1.graphics.travelSpeed);
+				w1.graphics.camera.pos = w1.graphics.camera.pos - (w1.graphics.camera.X90 * speed);
 			}
 			if (w1.keyboard.IsPressed(VK_SPACE))
 			{
-				w1.graphics.camera.pos = w1.graphics.camera.pos + (w1.graphics.camera.Y90 * w1.graphics.travelSpeed);
+				w1.graphics.camera.pos = w1.graphics.camera.pos + (w1.graphics.camera.Y90 * speed);
 			}
 			if (w1.keyboard.IsPressed(VK_SHIFT))
 			{
-				w1.graphics.camera.pos = w1.graphics.camera.pos - (w1.graphics.camera.Y90 * w1.graphics.travelSpeed);
+				w1.graphics.camera.pos = w1.graphics.camera.pos - (w1.graphics.camera.Y90 * speed);
 			}
 			if (w1.keyboard.IsPressed('T'))
 			{
@@ -87,6 +92,7 @@ int WINAPI WinMain(
 			w1.graphics.DrawCrosshair();
 			
 			w1.UpdateScreen();
+			w1.graphics.zBuffer.Clear();
 			auto e1 = std::chrono::high_resolution_clock::now();
 			auto fps = 1.0 / std::chrono::duration<double>(e1 - s).count();
 			if (fps > 1000)

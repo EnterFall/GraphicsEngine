@@ -3,7 +3,7 @@
 CpuGraphics::CpuGraphics()
 {
 	screenBuffer = std::make_shared<Color[]>(bufferWidth * bufferHeight);
-	clipBuffer = std::vector<Vec2f>(6);
+	clipBuffer = std::vector<Vec3f>(6);
 
 	for (int y = 0; y < bufferHeight; y++)
 	{
@@ -61,107 +61,85 @@ void CpuGraphics::DrawRect(int x0, int y0, int x1, int y1, Color color)
 	}
 }
 
-void CpuGraphics::DrawTriangle(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, Color color)
+void CpuGraphics::DrawScreenTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, Color color)
 {
-	const Vec2f* p0 = &v0;
-	const Vec2f* p1 = &v1;
-	const Vec2f* p2 = &v2;
+	const Vec3f* p0 = &v0;
+	const Vec3f* p1 = &v1;
+	const Vec3f* p2 = &v2;
 	if (p0->y > p1->y) std::swap(p0, p1);
 	if (p1->y > p2->y) std::swap(p1, p2);
 	if (p0->y > p1->y) std::swap(p0, p1);
 
-	if (p1->y == p2->y)
+	if (p0->y != p1->y && p1->y != p2->y)
+	{
+		auto r = *p2 - *p0;
+		Vec3f cross = { p0->x + r.x * ((p1->y - p0->y) / r.y), p1->y, p0->z + r.z * ((p1->y - p0->y) / r.y) };
+		const Vec3f* c = &cross;
+
+		if (c->x < p1->x) std::swap(c, p1);
+		DrawTriangleFromTo(*p0, *p1, *p0, *c, color);
+		DrawTriangleFromTo(*p1, *p2, *c, *p2, color);
+	}
+	else if (p1->y == p2->y)
 	{
 		if (p1->x > p2->x) std::swap(p1, p2);
-		DrawTriangleFlatBottom(*p0, *p1, *p2, color);
+		DrawTriangleFromTo(*p0, *p1, *p0, *p2, color);
 	}
 	else if (p0->y == p1->y)
 	{
 		if (p0->x > p1->x) std::swap(p0, p1);
-		DrawTriangleFlatTop(*p0, *p1, *p2, color);
-	}
-	else
-	{
-		auto r = *p2 - *p0;
-		Vec2f cross = { p0->x + r.x * ((p1->y - p0->y) / r.y), p1->y };
-		const Vec2f* c = &cross;
-
-		if (c->x < p1->x) std::swap(c, p1);
-		DrawTriangleFlatBottom(*p0, *p1, *c, color);
-		DrawTriangleFlatTop(*p1, *c, *p2, color);
+		DrawTriangleFromTo(*p0, *p2, *p1, *p2, color);
 	}
 }
 
 // Sometimes pixel holes appear (
-void CpuGraphics::DrawTriangleFlatBottom(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, Color color)
+void CpuGraphics::DrawTriangleFromTo(const Vec3f& leftS, const Vec3f& leftE, const Vec3f& rightS, const Vec3f& rightE, Color color)
 {
-	Vec2f vLeft = v1 - v0;
-	Vec2f vRight = v2 - v0;
+	Vec3f vLeft = leftE - leftS;
+	Vec3f vRight = rightE - rightS;
 
 	float dxLeft = vLeft.x / vLeft.y;
 	float dxRight = vRight.x / vRight.y;
 
-	float outLeft = std::clamp(-v0.y / vLeft.y, 0.f, 1.f);
-	float outRight = std::clamp(-v0.y / vRight.y, 0.f, 1.f);
+	float dzLeft = vLeft.z / vLeft.y;
 
-	int yStart = std::clamp((int)round(v0.y), 0, bufferHeight);
-	int yEnd = std::clamp((int)ceil(v2.y - 0.5f), 0, bufferHeight);
+	float outLeft = std::clamp(-leftS.y / vLeft.y, 0.f, 1.f);
+	float outRight = std::clamp(-rightS.y / vRight.y, 0.f, 1.f);
 
-	// if y < 0, start vectors will be corrected
-	auto leftCorr = v0 + vLeft * outLeft;
-	auto rightCorr = v0 + vRight * outRight;
-
-	float xLeft = leftCorr.x + dxLeft * (0.5f - leftCorr.y + float(yStart));
-	float xRight = rightCorr.x + dxRight * (0.5f - rightCorr.y + float(yStart));
-	
-
-	int index = yStart * bufferWidth;
-
-	for (int y = yStart; y < yEnd; y++)
-	{
-		int xStart = std::clamp((int)ceil(xLeft - 0.5f), 0, bufferWidth);
-		int xEnd =   std::clamp((int)ceil(xRight - 0.5f), 0, bufferWidth);
-		std::fill_n(screenBuffer.get() + index + xStart, xEnd - xStart, color);
-		xLeft += dxLeft;
-		xRight += dxRight;
-
-		index += bufferWidth;
-	}
-}
-
-// Sometimes pixel holes appear (
-void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, Color color)
-{
-	Vec2f vLeft = v2 - v0;
-	Vec2f vRight = v2 - v1;
-
-	float dxLeft = vLeft.x / vLeft.y;
-	float dxRight = vRight.x / vRight.y;
-
-	float outLeft = std::clamp(-v0.y / vLeft.y, 0.f, 1.f);
-	float outRight = std::clamp(-v1.y / vRight.y, 0.f, 1.f);
-
-	int yStart = std::clamp((int)ceil(v0.y - 0.5f), 0, bufferHeight);
-	int yEnd = std::clamp((int)ceil(v2.y - 0.5f), 0, bufferHeight);
+	int yStart = std::clamp((int)ceil(leftS.y - 0.5f), 0, bufferHeight);
+	int yEnd = std::clamp((int)ceil(rightE.y - 0.5f), 0, bufferHeight);
 
 	// if y < 0, start vectors will be corrected
-	auto leftCorr = v0 + vLeft * outLeft;
-	auto rightCorr = v1 + vRight * outRight;
+	Vec3f leftCorr = leftS + vLeft * outLeft;
+	Vec3f rightCorr = rightS + vRight * outRight;
 
 	float t;
 	float xLeft = leftCorr.x + dxLeft * modf(0.5f - leftCorr.y + float(yStart), &t);
 	float xRight = rightCorr.x + dxRight * modf(0.5f - rightCorr.y + float(yStart), &t);
 
-	int index = yStart * bufferWidth;
+	float zLeft = leftCorr.z + dzLeft * modf(0.5f - leftCorr.y + float(yStart), &t);
 
+	Vec3f d = ((rightE + rightS) * 0.5f) - ((leftE + leftS) * 0.5f);
+	float dz = d.z / d.x;
+	int index = yStart * bufferWidth;
 	for (int y = yStart; y < yEnd; y++)
 	{
 		int xStart = std::clamp((int)ceil(xLeft - 0.5f), 0, bufferWidth);
-		int xEnd =   std::clamp((int)ceil(xRight - 0.5f), 0, bufferWidth);
-		std::fill_n(screenBuffer.get() + index + xStart, xEnd - xStart, color);
+		int xEnd = std::clamp((int)ceil(xRight - 0.5f), 0, bufferWidth);
+		
+		//generates small artifacts on crossing
+		float z = zLeft + dz * (xStart - ceil(xLeft - 0.5f));
+		for (int i = xStart; i < xEnd; i++)
+		{
+			if (zBuffer.Update(index + i, z))
+			{
+				screenBuffer[index + i] = color;
+			}
+			z += dz;
+		}
 		xLeft += dxLeft;
 		xRight += dxRight;
-
+		zLeft += dzLeft;
 		index += bufferWidth;
 	}
 }
@@ -169,7 +147,7 @@ void CpuGraphics::DrawTriangleFlatTop(const Vec2f& v0, const Vec2f& v1, const Ve
 void CpuGraphics::DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, Color color)
 {
 	// Backface culling, triangle in clockwise order is visible
-	if ((v1 - v0).Cross(v2 - v0).Dot(v0 - camera.pos) < 0)
+	//if ((v1 - v0).Cross(v2 - v0).Dot(v0 - camera.pos) < 0)
 	{
 		Vec3f val0;
 		Vec3f val1;
@@ -198,7 +176,7 @@ void CpuGraphics::DrawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2
 }
 
 // Only Z clipping
-void CpuGraphics::Clip(std::vector<Vec2f>* list, const Vec3f& v0, const Vec3f& v1)
+void CpuGraphics::Clip(std::vector<Vec3f>* list, const Vec3f& v0, const Vec3f& v1)
 {
 	float zClip = 1.0f;
 
@@ -228,10 +206,10 @@ void CpuGraphics::Clip(std::vector<Vec2f>* list, const Vec3f& v0, const Vec3f& v
 	}
 }
 
-void CpuGraphics::DrawRect(const Vec2f& v0, const Vec2f& v1, const Vec2f& v2, const Vec2f& v3, Color color)
+void CpuGraphics::DrawRect(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, const Vec3f& v3, Color color)
 {
-	DrawTriangle(v0, v1, v2, color);
-	DrawTriangle(v0, v2, v3, color);
+	DrawScreenTriangle(v0, v1, v2, color);
+	DrawScreenTriangle(v0, v2, v3, color);
 }
 
 void CpuGraphics::DrawCube(const Vec3f& p0, const Vec3f& p1, Color color)
@@ -260,7 +238,7 @@ void CpuGraphics::DrawCube(const Vec3f& p0, const Vec3f& p1, Color color)
 	DrawTriangle(p1, p1 - y - z, p1 - z, color);
 }
 
-void CpuGraphics::DrawPoligon(Vec2f* points, size_t count, Color color)
+void CpuGraphics::DrawPoligon(Vec3f* points, size_t count, Color color)
 {
 	auto v0 = points;
 	auto v1 = points + 1;
@@ -270,7 +248,7 @@ void CpuGraphics::DrawPoligon(Vec2f* points, size_t count, Color color)
 	{
 		if (*v1 != *v2)
 		{
-			DrawTriangle(*v0, *v1, *v2, color);
+			DrawScreenTriangle(*v0, *v1, *v2, color);
 		}
 		v1 = v2;
 		v2 = points + 1 + i;
