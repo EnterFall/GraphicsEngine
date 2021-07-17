@@ -10,11 +10,11 @@ struct Vec3
 
 	Vec3() = default;
 
-	Vec3(T x1, T y1, T z1)
+	Vec3(T x, T y, T z)
 	{
-		this->x = x1;
-		this->y = y1;
-		this->z = z1;
+		this->x = x;
+		this->y = y;
+		this->z = z;
 	}
 
 	Vec3 operator +(const Vec3& other) const

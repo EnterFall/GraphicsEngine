@@ -169,22 +169,27 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CpuGraphics.cpp" />
+    <ClCompile Include="Cube.cpp" />
     <ClCompile Include="EFException.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="CpuGraphics.h" />
+    <ClInclude Include="Cube.h" />
+    <ClInclude Include="CubesArrayScene.h" />
     <ClInclude Include="EFException.h" />
     <ClInclude Include="EFWin.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="Matrix3.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Vec2f.h" />
-    <ClInclude Include="Vec3f.h" />
+    <ClInclude Include="Vec3.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="ZBuffer.h" />
   </ItemGroup>

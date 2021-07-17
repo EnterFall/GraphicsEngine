@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Файлы заголовков\Geometry">
+      <UniqueIdentifier>{5cf228b4-a24e-4e9c-86ed-a7d4fb7b78dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Geometry">
+      <UniqueIdentifier>{e10f232e-39ff-426a-8db1-2b8c294cb182}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\CUDA">
+      <UniqueIdentifier>{4a4b0893-1c5e-407a-89ea-55e6734dbe16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Scenes">
+      <UniqueIdentifier>{dc161899-999c-4c6b-9d86-701606568e6b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -33,6 +45,12 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>Исходные файлы\Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EFWin.h">
@@ -50,7 +68,7 @@
     <ClInclude Include="CpuGraphics.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Vec3f.h">
+    <ClInclude Include="Vec3.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Keyboard.h">
@@ -70,6 +88,15 @@
     </ClInclude>
     <ClInclude Include="ZBuffer.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Файлы заголовков\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="CubesArrayScene.h">
+      <Filter>Файлы заголовков\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -50,7 +50,6 @@ private:
 		StaticWindowClass(const StaticWindowClass&) = delete;
 		StaticWindowClass& operator =(const StaticWindowClass&) = delete;
 	};
-
 public:
 	Window(int width, int height, std::string title);
 	~Window();
@@ -58,12 +57,12 @@ public:
 	CpuGraphics& GetGraphics();
 	void SetTitle(const std::string& newTitle) const;
 	void UpdateScreen();
+	bool ProcessMessages();
 	Window(const Window&) = delete;
 	Window& operator =(const Window&) = delete;
 private:
 	static LRESULT WINAPI RedirectMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT WINAPI RedirectMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 	void OnSize();
 };

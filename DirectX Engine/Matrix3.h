@@ -1,5 +1,5 @@
 #pragma once
-#include "Vec3f.h"
+#include "Vec3.h"
 
 template <typename T>
 struct Matrix3
@@ -104,5 +104,5 @@ struct Matrix3
 			vector.x * p20 + vector.y * p21 + vector.z * p22);
 	}
 };
-typedef Matrix3<float> Matrix3f;
+typedef Matrix3<double> Matrix3f;
 typedef Matrix3<double> Matrix3d;
