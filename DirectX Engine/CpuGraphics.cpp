@@ -2,7 +2,7 @@
 
 CpuGraphics::CpuGraphics()
 {
-	screenBuffer = std::make_shared<Color[]>(bufferWidth * bufferHeight);
+	screenBuffer = std::make_unique<Color[]>(bufferWidth * bufferHeight);
 	clipBuffer = std::vector<Vec3d>(6);
 
 	for (int y = 0; y < bufferHeight; y++)
@@ -39,7 +39,7 @@ void CpuGraphics::Clear()
 	{
 		for (int x = 0; x < bufferWidth; x++)
 		{
-			screenBuffer[y * bufferWidth + x] = Colors::Black;
+			screenBuffer[y * bufferWidth + x] = 0u;
 		}
 	}
 }
@@ -131,11 +131,12 @@ void CpuGraphics::DrawTriangleFromTo(const Vec3d& leftS, const Vec3d& leftE, con
 		//double z = zLeft + dz * (std::clamp(xLeft, 0.0, (double)bufferWidth) - xLeft + (modf(0.5 - xLeft, &t)));
 		//double z = zLeft + dz * (xStart - xLeft + abs(xLeft - ceil(xLeft - 0.5)));
 		double z = zLeft + dz * (std::clamp(xLeft, 0.0, (double)bufferWidth) - xLeft);
-		for (int i = xStart; i < xEnd; i++)
+		//auto locker = std::lock_guard<std::mutex>(drawMutex);
+		for (int x = xStart; x < xEnd; x++)
 		{
-			if (zBuffer.Update(index + i, 1.0 / z))
+			if (zBuffer.Update(index + x, 1.0 / z))
 			{
-				screenBuffer[index + i] = color;
+				screenBuffer[index + x] = color;
 			}
 			z += dz;
 		}
@@ -167,15 +168,20 @@ void CpuGraphics::DrawTriangle(const Vec3d& v0, const Vec3d& v1, const Vec3d& v2
 			val2 = Transform(v2);
 		}
 
+		if (val0.z < zClip && val1.z < zClip && val2.z < zClip)
+			return;
+
 		// if vertices not clipped, clipBuffer may contains same elements
 		if (val0.z < zClip || val1.z < zClip || val2.z < zClip)
 		{
-			Clip(&clipBuffer, val0, val1);
-			Clip(&clipBuffer, val1, val2);
-			Clip(&clipBuffer, val2, val0);
+			auto cBuf = std::vector<Vec3d>();
+			cBuf.reserve(10);
+			Clip(&cBuf, val0, val1);
+			Clip(&cBuf, val1, val2);
+			Clip(&cBuf, val2, val0);
 
-			DrawPoligon(clipBuffer.begin()._Ptr, clipBuffer.size(), color);
-			clipBuffer.clear();
+			DrawPoligon(cBuf.begin()._Ptr, cBuf.size(), color);
+			cBuf.clear();
 		}
 		else
 		{
@@ -301,7 +307,7 @@ void CpuGraphics::DrawCrosshair()
 	{
 		for (int x = widthHalf - offset; x < widthHalf + offset; x++)
 		{
-			screenBuffer[y * bufferWidth + x] = Colors::Blue;
+			screenBuffer[y * bufferWidth + x] = 0x0000FF;
 		}
 	}
 }
@@ -309,19 +315,36 @@ void CpuGraphics::DrawCrosshair()
 void CpuGraphics::Draw(const Cube& cube, Color color)
 {
 	const Vec3d* v = cube.GetVerts();
-	DrawTriangle(v[0], v[2], v[1], color);
-	DrawTriangle(v[1], v[2], v[3], color);
-	DrawTriangle(v[0], v[4], v[2], color);
-	DrawTriangle(v[4], v[6], v[2], color);
-	DrawTriangle(v[1], v[3], v[5], color);
-	DrawTriangle(v[5], v[3], v[7], color);
-	DrawTriangle(v[0], v[1], v[4], color);
-	DrawTriangle(v[4], v[1], v[5], color);
-
-	DrawTriangle(v[2], v[6], v[7], color);
-	DrawTriangle(v[7], v[3], v[2], color);
-	DrawTriangle(v[4], v[5], v[7], color);
-	DrawTriangle(v[7], v[6], v[4], color);
+	//if (Vec3d(0.0, 0.0, -1.0).Dot(v[0] - camera.pos) < 0.0)
+	{
+		DrawTriangle(v[0], v[2], v[1], color);
+		DrawTriangle(v[1], v[2], v[3], color);
+	}
+	//if (Vec3d(-1.0, 0.0, 0.0).Dot(v[0] - camera.pos) < 0.0)
+	{
+		DrawTriangle(v[0], v[4], v[2], color);
+		DrawTriangle(v[4], v[6], v[2], color);
+	}
+	//if (Vec3d(1.0, 0.0, 0.0).Dot(v[1] - camera.pos) < 0.0)
+	{
+		DrawTriangle(v[1], v[3], v[5], color);
+		DrawTriangle(v[5], v[3], v[7], color);
+	}
+	//if (Vec3d(0.0, -1.0, 0.0).Dot(v[0] - camera.pos) < 0.0)
+	{
+		DrawTriangle(v[0], v[1], v[4], color);
+		DrawTriangle(v[4], v[1], v[5], color);
+	}
+	//if (Vec3d(0.0, 1.0, 0.0).Dot(v[2] - camera.pos) < 0.0)
+	{
+		DrawTriangle(v[2], v[6], v[7], color);
+		DrawTriangle(v[7], v[3], v[2], color);
+	}
+	//if (Vec3d(0.0, 0.0, 1.0).Dot(v[4] - camera.pos) < 0.0)
+	{
+		DrawTriangle(v[4], v[5], v[7], color);
+		DrawTriangle(v[7], v[6], v[4], color);
+	}
 }
 
 Vec3d CpuGraphics::Transform(const Vec3d& vertex) const

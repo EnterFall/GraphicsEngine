@@ -98,7 +98,7 @@ struct Matrix3
 
 	Vec3<T> Mult(const Vec3<T>& vector) const
 	{
-		return Vec3(
+		return Vec3<T>(
 			vector.x * p00 + vector.y * p01 + vector.z * p02,
 			vector.x * p10 + vector.y * p11 + vector.z * p12,
 			vector.x * p20 + vector.y * p21 + vector.z * p22);

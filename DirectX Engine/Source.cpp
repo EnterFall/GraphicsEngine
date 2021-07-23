@@ -1,6 +1,7 @@
 #include "Window.h"
 #include <chrono>
 #include "Matrix3.h"
+#include "CubesArrayScene_CUDA.h"
 #include "CubesArrayScene.h"
 
 int WINAPI WinMain(
@@ -13,13 +14,17 @@ int WINAPI WinMain(
 	{
 		Window w1(1900, 1000, "LolTestLol");
 
-		auto scene = CubesArrayScene(&w1.graphics, &w1.keyboard, 40);
+		CudaAssert(cudaSetDevice(0));
+		CudaAssert(cudaDeviceSetLimit(cudaLimitMallocHeapSize, 1024 * 1024 * 1024));
+
+		auto scene = CubesArrayScene_CUDA(&w1.graphics, &w1.keyboard, 40);
 		while (true)
 		{
 			auto s = std::chrono::high_resolution_clock::now();
 			
 			if (!w1.ProcessMessages())
 			{
+				CudaAssert(cudaDeviceReset());
 				return 0;
 			}
 

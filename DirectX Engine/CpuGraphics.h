@@ -4,6 +4,7 @@
 #include <cmath>
 #include <numbers>
 #include <vector>
+#include <mutex>
 
 #include "Vec2f.h"
 #include "Vec3.h"
@@ -15,23 +16,25 @@
 #include "ZBuffer.h"
 #include "Cube.h"
 
+
 class CpuGraphics
 {
 public:
 	const int bufferWidth = 1920;
 	const int bufferHeight = 1080;
-	const float widthHalf = bufferWidth >> 1;
-	const float heightHalf = bufferHeight >> 1;
+	const double widthHalf = bufferWidth >> 1;
+	const double heightHalf = bufferHeight >> 1;
 	double fov = MathHelper::PI_2;
 	double travelSpeed = 4.0;
 	bool isMatrixTransform = true;
 	Camera camera = Camera(bufferWidth, bufferHeight, fov);
 	ZBuffer zBuffer = ZBuffer(bufferWidth * bufferHeight);
 	double zClip = 0.1;
+	std::unique_ptr<Color[]> screenBuffer;
 private:
-	std::shared_ptr<Color[]> screenBuffer;
 	std::vector<Vec3d> clipBuffer;
 	BITMAPINFO bufferInfo;
+	std::mutex drawMutex;
 public:
 	CpuGraphics();
 	Color* GetScreenBuffer() const;

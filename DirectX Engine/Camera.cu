@@ -1,7 +1,12 @@
 #include "Camera.h"
 
-Camera::Camera(int width, int height, double fov)
+__host__ __device__ Camera::Camera(int width, int height, double fov)
 {
+	pos = Vec3d();
+	X90 = Vec3d(1.0, 0.0, 0.0);
+	Y90 = Vec3d(0.0, 1.0, 0.0);
+	Z90 = Vec3d(0.0, 0.0, 1.0);
+
 	widthHalf = width >> 1;
 	heightHalf = height >> 1;
 	fovW = fov;
@@ -19,7 +24,7 @@ Camera::Camera(int width, int height, double fov)
 	topNormal = Vec3d(0.0, -bottomNormal.y, bottomNormal.z);
 }
 
-void Camera::Rotate(double x, double y)
+__host__ __device__ void Camera::Rotate(double x, double y)
 {
 	Z90 = Vec3d(cos(y) * sin(x), sin(y), cos(y) * cos(x));
 	Y90 = Vec3d(cos(y + MathHelper::PI_2) * sin(x), sin(y + MathHelper::PI_2), cos(y + MathHelper::PI_2) * cos(x));
@@ -28,7 +33,7 @@ void Camera::Rotate(double x, double y)
 	transform = Matrix3f(X90, Y90, Z90).Inverse2();
 }
 
-Vec3d Camera::ToScreen(const Vec3d& v) const
+__host__ __device__ Vec3d Camera::ToScreen(const Vec3d& v) const
 {
 	auto projScaleX = scaleX / v.z;
 	auto projScaleY = scaleY / v.z;

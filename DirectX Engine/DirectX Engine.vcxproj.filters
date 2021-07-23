@@ -25,6 +25,12 @@
     <Filter Include="Файлы заголовков\Scenes">
       <UniqueIdentifier>{dc161899-999c-4c6b-9d86-701606568e6b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\CUDA">
+      <UniqueIdentifier>{32981e40-4b49-4e6d-b1d2-ec33464bace6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Scenes">
+      <UniqueIdentifier>{4cf7ab7e-2b40-4fa3-b69f-25a4a8c86517}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -42,14 +48,8 @@
     <ClCompile Include="Keyboard.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Cube.cpp">
-      <Filter>Исходные файлы\Geometry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,9 +86,6 @@
     <ClInclude Include="Color.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="ZBuffer.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
@@ -98,5 +95,31 @@
     <ClInclude Include="CubesArrayScene.h">
       <Filter>Файлы заголовков\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="CubesArrayScene_CUDA.h">
+      <Filter>Файлы заголовков\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="ZBuffer.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="CudaHelper.h">
+      <Filter>Файлы заголовков\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="GpuGraphics.h">
+      <Filter>Файлы заголовков\CUDA</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="GpuGraphics.cu">
+      <Filter>Исходные файлы\CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Cube.cu">
+      <Filter>Исходные файлы\Geometry</Filter>
+    </CudaCompile>
+    <CudaCompile Include="CubesArrayScene_CUDA.cu">
+      <Filter>Исходные файлы\Scenes</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Camera.cu">
+      <Filter>Исходные файлы</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

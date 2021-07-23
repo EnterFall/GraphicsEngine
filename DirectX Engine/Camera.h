@@ -1,16 +1,16 @@
 #pragma once
+#include "cuda_runtime.h"
 #include "Vec3.h"
 #include "Matrix3.h"
 #include "MathHelper.h"
-#include "Vec2f.h"
 
 class Camera
 {
 public:
-	Vec3d pos = Vec3d();
-	Vec3d X90 = Vec3d(1.0, 0.0, 0.0);
-	Vec3d Y90 = Vec3d(0.0, 1.0, 0.0);
-	Vec3d Z90 = Vec3d(0.0, 0.0, 1.0);
+	Vec3d pos;
+	Vec3d X90;
+	Vec3d Y90;
+	Vec3d Z90;
 	Matrix3f transform;
 	Vec3d leftNormal;
 	Vec3d rightNormal;
@@ -23,8 +23,8 @@ public:
 	double scaleX;
 	double scaleY;
 public:
-	Camera(int width, int height, double fov);
-	void Rotate(double x, double y);
-	Vec3d ToScreen(const Vec3d& v) const;
+	__host__ __device__ Camera(int width, int height, double fov);
+	__host__ __device__ void Rotate(double x, double y);
+	__host__ __device__ Vec3d ToScreen(const Vec3d& v) const;
 };
 

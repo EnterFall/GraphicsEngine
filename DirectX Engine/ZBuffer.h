@@ -1,20 +1,22 @@
 #pragma once
+#include "cuda_runtime.h"
+#include <cmath>
 #include <memory>
+#include <algorithm>
 
 class ZBuffer
 {
-public:
-	int size;
 private:
-	std::shared_ptr<double[]> buffer;
+	int size;
 public:
-	ZBuffer(int size) : size(size)
+	double* buffer;
+	__host__ __device__ ZBuffer(int size) : size(size)
 	{
-		buffer = std::make_shared<double[]>(size);
+		buffer = new double[size];
 		Clear();
 	}
 
-	bool Update(int index, double val)
+	__host__ __device__ bool Update(int index, double val)
 	{
 		if (val < buffer[index])
 		{
@@ -24,9 +26,13 @@ public:
 		return false;
 	}
 
-	void Clear()
+	__host__ __device__ void Clear()
 	{
-		std::fill_n(buffer.get(), size, std::numeric_limits<double>::max());
-		//std::fill_n(buffer.get(), size, 0.0);
+		memset(buffer, 0x7f, size * sizeof(double));
+	}
+
+	__host__ __device__ ~ZBuffer()
+	{
+		delete[] buffer;
 	}
 };

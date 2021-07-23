@@ -3,6 +3,9 @@
 EFException::EFException(int line, std::string file) : line(line), file(file)
 {}
 
+EFException::EFException(int line, std::string file, const char* message) : line(line), file(file), message(message)
+{}
+
 int EFException::GetLine() const
 {
 	return line;
@@ -17,7 +20,8 @@ std::string EFException::GetString() const
 {
 	std::ostringstream stream;
 	stream << "[File] " << GetFile() << std::endl
-		   << "[Line] " << GetLine();
+		   << "[Line] " << GetLine()
+		   << "[Mess] " << message;
 	return stream.str();
 }
 

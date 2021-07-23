@@ -1,6 +1,6 @@
 #include "Cube.h"
 
-Cube::Cube(const Vec3d& pos, double size)
+__host__ __device__ Cube::Cube(const Vec3d& pos, double size)
 {
 	verts[0] = Vec3d(pos.x, pos.y, pos.z);						//000
 	verts[1] = Vec3d(pos.x + size, pos.y, pos.z);				//100
@@ -12,7 +12,7 @@ Cube::Cube(const Vec3d& pos, double size)
 	verts[7] = Vec3d(pos.x + size, pos.y + size, pos.z + size);	//111
 }
 
-const Vec3d* Cube::GetVerts() const
+__host__ __device__ const Vec3d* Cube::GetVerts() const
 {
 	return verts;
 }

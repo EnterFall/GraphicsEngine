@@ -1,6 +1,7 @@
 #pragma once
-#include "Window.h"
+#include <thread> 
 #include "MathHelper.h"
+#include "Window.h"
 
 class CubesArrayScene
 {
@@ -13,13 +14,14 @@ private:
 public:
 	CubesArrayScene(CpuGraphics* g, Keyboard* kbd, unsigned int size) : g(g), kbd(kbd), size(size)
 	{
-		// 22 fps (40)
+		// 22.5 fps (40)
 		srand(3454);
 		g->camera.pos = Vec3d(-50.0, 50.0, -50.0) / 5;
 		g->camera.Rotate(MathHelper::PI_4, -MathHelper::PI_4 + 0.2);
 		cubes = std::vector<Cube>();
 		for (unsigned int z = 0; z < size; z++)
 		{
+			// y from far to near, so ZBuffer almost dont reject drawing. Even if y goes to far, fps is not improved.
 			for (int y = -(int)size; y < 0; y++)
 			{
 				for (unsigned int x = 0; x < size; x++)
@@ -30,6 +32,15 @@ public:
 					}
 				}
 			}
+		}
+	}
+
+	void DrawConc(int from, int to)
+	{
+		double scaler = 256.0 / size;
+		for (int i = from; i < to; i++)
+		{
+			g->Draw(cubes[i], Color(cubes[i].verts[0].x * scaler, cubes[i].verts[0].y * scaler, cubes[i].verts[0].z * scaler));
 		}
 	}
 
@@ -94,11 +105,21 @@ public:
 		}
 
 		g->Clear();
-
-		double scaler = 256.0 / size;
-		for (size_t i = 0; i < cubes.size(); i++)
+		// 22 - 36 - 45 - 52 - 60 - 68
+		const int count = 12;
+		int val = 0;
+		int elCount = cubes.size() / count;
+		std::vector<std::thread> t = std::vector<std::thread>();
+		for (size_t i = 0; i < count - 1; i++)
 		{
-			g->Draw(cubes[i], Color(cubes[i].verts[0].x * scaler, cubes[i].verts[0].y * scaler, cubes[i].verts[0].z * scaler));
+			t.emplace_back(&CubesArrayScene::DrawConc, this, val, val + elCount);
+			val += elCount;
+		}
+		t.emplace_back(&CubesArrayScene::DrawConc, this, val, cubes.size());
+
+		for (size_t i = 0; i < t.size(); i++)
+		{
+			t[i].join();
 		}
 
 	}
