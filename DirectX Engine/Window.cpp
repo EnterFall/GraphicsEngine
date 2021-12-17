@@ -1,4 +1,6 @@
 #include "Window.h"
+#include <memory>
+#include <algorithm>
 
 Window::StaticWindowClass Window::StaticWindowClass::wndClass = StaticWindowClass();
 
@@ -68,14 +70,19 @@ Window::Window(int width, int height, std::string title)
 	this->width = width;
 	this->height = height;
 	this->hdc = GetDC(hWnd);
+	
+	dxGraphics = std::make_unique<DirectXGraphics>(hWnd);
 
 	// // - WS_VISIBLE is set
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
+
+	
 }
 
 Window::~Window()
 {
-	DestroyWindow(hWnd);
+	if (!DestroyWindow(hWnd))
+		throw WindowExceptLastError();
 }
 
 HWND Window::GetHWnd() const
@@ -111,6 +118,11 @@ void Window::UpdateScreen()
 
 	if (!StretchDIBits(hdc, 0, 0, width, height, location.x, graphics.bufferHeight - location.y - height, width, height, graphics.GetScreenBuffer(), &graphics.GetBufferInfo(), DIB_RGB_COLORS, SRCCOPY))
 		throw WindowExceptLastError();
+
+	//dxGraphics->Clear(1.0f, 0.0f, 0.0f);
+	//dxGraphics->TestDrawTriangle();
+
+	//dxGraphics->EndFrame();
 }
 
 bool Window::ProcessMessages()

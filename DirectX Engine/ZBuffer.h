@@ -9,14 +9,14 @@ class ZBuffer
 private:
 	int size;
 public:
-	double* buffer;
+	float* buffer;
 	__host__ __device__ ZBuffer(int size) : size(size)
 	{
-		buffer = new double[size];
+		buffer = new float[size];
 		Clear();
 	}
 
-	__host__ __device__ bool Update(int index, double val)
+	__host__ __device__ bool Update(int index, float val)
 	{
 		if (val < buffer[index])
 		{
@@ -28,7 +28,7 @@ public:
 
 	__host__ __device__ void Clear()
 	{
-		memset(buffer, 0x7f, size * sizeof(double));
+		memset(buffer, 0x7f, size * sizeof(float));
 	}
 
 	__host__ __device__ ~ZBuffer()

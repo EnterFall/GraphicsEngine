@@ -5,11 +5,11 @@
 class Cube
 {
 public:
-	Vec3d verts[8];
+	Vec3f verts[8];
 private:
 
 public:
-	__host__ __device__ Cube(const Vec3d& pos, double size = 1.0);
-	__host__ __device__ const Vec3d* GetVerts() const;
+	__host__ __device__ Cube(const Vec3f& pos, float size = 1.0f);
+	__host__ __device__ const Vec3f* GetVerts() const;
 };
 

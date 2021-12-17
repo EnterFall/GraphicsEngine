@@ -93,7 +93,7 @@ struct Matrix3
 		return Matrix3(
 			a, p02 * p21 - p01 * p22, p01 * p12 - p02 * p11,
 			b, p00 * p22 - p02 * p20, p02 * p10 - p00 * p12,
-			c, p01 * p20 - p00 * p21, p00 * p11 - p01 * p10) *= (1.0 / det);
+			c, p01 * p20 - p00 * p21, p00 * p11 - p01 * p10) *= (1.0f / det);
 	}
 
 	Vec3<T> Mult(const Vec3<T>& vector) const
@@ -104,5 +104,5 @@ struct Matrix3
 			vector.x * p20 + vector.y * p21 + vector.z * p22);
 	}
 };
-typedef Matrix3<double> Matrix3f;
-typedef Matrix3<double> Matrix3d;
+typedef Matrix3<float> Matrix3f;
+typedef Matrix3<float> Matrix3d;

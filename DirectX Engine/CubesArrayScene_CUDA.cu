@@ -3,8 +3,8 @@
 CubesArrayScene_CUDA::CubesArrayScene_CUDA(CpuGraphics* g, Keyboard* kbd, unsigned int size) : g(g), kbd(kbd), size(size)
 {
 	srand(3454);
-	g->camera.pos = Vec3d(-50.0, 50.0, -50.0) / 5;
-	g->camera.Rotate(MathHelper::PI_4, -MathHelper::PI_4 + 0.2);
+	g->camera.pos = Vec3f(-50.0f, 50.0f, -50.0f) / 5;
+	g->camera.Rotate(MathHelper::PI_4, -MathHelper::PI_4 + 0.2f);
 
 	gCuda = CudaHelper::CreateManagedCudaObj<GpuGraphics>();
 	screenBufferCuda = CudaHelper::CreateManagedCudaObj<Color>(g->bufferWidth * g->bufferHeight);
@@ -22,7 +22,7 @@ CubesArrayScene_CUDA::CubesArrayScene_CUDA(CpuGraphics* g, Keyboard* kbd, unsign
 			{
 				if (rand() % 4 == 0)
 				{
-					cubes.emplace_back(Vec3d(x, y, z), 1.0);
+					cubes.emplace_back(Vec3f(x, y, z), 1.0f);
 				}
 			}
 		}
@@ -32,10 +32,10 @@ CubesArrayScene_CUDA::CubesArrayScene_CUDA(CpuGraphics* g, Keyboard* kbd, unsign
 
 void CubesArrayScene_CUDA::Play()
 {
-	double speed = g->travelSpeed;
+	float speed = g->travelSpeed;
 	if (kbd->IsPressed('R'))
 	{
-		speed /= 10.0;
+		speed /= 10.0f;
 	}
 	if (kbd->IsPressed('C'))
 	{
@@ -80,7 +80,9 @@ void CubesArrayScene_CUDA::Play()
 
 	POINT e;
 	if (!GetCursorPos(&e))
-		throw WindowExceptLastError();
+	{
+
+	}
 
 	if (isFreeCamera)
 	{
@@ -93,15 +95,27 @@ void CubesArrayScene_CUDA::Play()
 	dim3 threadsPerBlock = dim3(8, 8);
 	dim3 numBlocks = dim3(g->bufferWidth / threadsPerBlock.x, g->bufferHeight / threadsPerBlock.y);
 	Clear<<<numBlocks, threadsPerBlock>>>(gCuda);
-
-	//CudaAssert(cudaGetLastError());
-	//CudaAssert(cudaDeviceSynchronize());
-	
+	CudaAssert(cudaGetLastError());
+	CudaAssert(cudaDeviceSynchronize());
 	CudaAssert(cudaMemcpyAsync(cameraCuda, &g->camera, sizeof(Camera), cudaMemcpyHostToDevice));
 
-	DrawCubes<<<(cubes.size() / 32) + 1, 32>>>(gCuda, cubesCuda, cubes.size(), size);
-	//CudaAssert(cudaGetLastError());
-	//CudaAssert(cudaDeviceSynchronize());
+	//auto tr = std::vector<Vec3f>();
+	//g->tr = &tr;
+
+	//g->gCudaPtr = gCuda;
+	//for (int i = 0; i < cubes.size(); i++)
+	//{
+	//	g->Draw(cubes[i], 0xFFFFFF);
+	//}
+	
+	//auto trCuda = CudaHelper::CreateCopyToManagedCudaObj<Vec3f>(tr.begin()._Ptr, tr.size());
+	//DrawTriangleFromTo<<<((tr.size() / 4) / 32) + 1, 32>>>(gCuda, trCuda, tr.size() / 4, 0xFFFFFF);
+	//CudaAssert(cudaFree(trCuda));
+	// 
+	DrawCubes<<<((cubes.size() * 12) / 32) + 1, 32>>>(gCuda, cubesCuda, cubes.size(), size);
+
+	CudaAssert(cudaGetLastError());
+	CudaAssert(cudaDeviceSynchronize());
 	CudaAssert(cudaMemcpyAsync(g->screenBuffer.get(), screenBufferCuda, g->bufferWidth * g->bufferHeight * sizeof(Color), cudaMemcpyDeviceToHost));
 
 }

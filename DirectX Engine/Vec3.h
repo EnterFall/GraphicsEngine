@@ -38,6 +38,14 @@ struct Vec3
 		return Vec3(x / other.x, y / other.y, z / other.z);
 	}
 
+	__host__ __device__ Vec3& operator +=(const Vec3& other)
+	{
+		x += other.x;
+		y += other.y;
+		z += other.z;
+		return *this;
+	}
+
 	__host__ __device__ Vec3 operator +(const T& val) const
 	{
 		return Vec3(x + val, y + val, z + val);
@@ -59,7 +67,7 @@ struct Vec3
 		return Vec3(x * v, y * v, z * v);
 	}
 
-	__host__ __device__ Vec3& operator +=(const T& val) const
+	__host__ __device__ Vec3& operator +=(const T& val)
 	{
 		x += val;
 		y += val;
@@ -113,5 +121,6 @@ struct Vec3
 		z *= len;
 	}
 };
+typedef Vec3<int> Vec3i;
 typedef Vec3<float> Vec3f;
 typedef Vec3<double> Vec3d;

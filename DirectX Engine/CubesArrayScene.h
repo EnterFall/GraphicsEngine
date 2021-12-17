@@ -14,10 +14,10 @@ private:
 public:
 	CubesArrayScene(CpuGraphics* g, Keyboard* kbd, unsigned int size) : g(g), kbd(kbd), size(size)
 	{
-		// 22.5 fps (40)
+		// 22.5f fps (40)
 		srand(3454);
-		g->camera.pos = Vec3d(-50.0, 50.0, -50.0) / 5;
-		g->camera.Rotate(MathHelper::PI_4, -MathHelper::PI_4 + 0.2);
+		g->camera.pos = Vec3f(-50.0f, 50.0f, -50.0f) / 5;
+		g->camera.Rotate(MathHelper::PI_4, -MathHelper::PI_4 + 0.2f);
 		cubes = std::vector<Cube>();
 		for (unsigned int z = 0; z < size; z++)
 		{
@@ -28,7 +28,7 @@ public:
 				{
 					if (rand() % 4 == 0)
 					{
-						cubes.emplace_back(Vec3d(x, y, z), 1.0);
+						cubes.emplace_back(Vec3f(x, y, z), 1.0f);
 					}
 				}
 			}
@@ -37,7 +37,7 @@ public:
 
 	void DrawConc(int from, int to)
 	{
-		double scaler = 256.0 / size;
+		float scaler = 256.0f / size;
 		for (int i = from; i < to; i++)
 		{
 			g->Draw(cubes[i], Color(cubes[i].verts[0].x * scaler, cubes[i].verts[0].y * scaler, cubes[i].verts[0].z * scaler));
@@ -46,10 +46,10 @@ public:
 
 	void Play()
 	{
-		double speed = g->travelSpeed;
+		float speed = g->travelSpeed;
 		if (kbd->IsPressed('R'))
 		{
-			speed /= 10.0;
+			speed /= 10.0f;
 		}
 		if (kbd->IsPressed('C'))
 		{

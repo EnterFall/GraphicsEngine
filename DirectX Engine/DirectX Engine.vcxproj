@@ -98,7 +98,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Precise</FloatingPointModel>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -112,7 +112,17 @@
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
       <GenerateLineInfo>true</GenerateLineInfo>
       <CodeGeneration>compute_61,sm_61</CodeGeneration>
+      <MaxRegCount>0</MaxRegCount>
+      <FastMath>true</FastMath>
+      <CudaRuntime>Static</CudaRuntime>
+      <ExtensibleWholeProgramCompilation>false</ExtensibleWholeProgramCompilation>
+      <InterleaveSourceInPTX>
+      </InterleaveSourceInPTX>
+      <Optimization>Od</Optimization>
     </CudaCompile>
+    <CudaLink>
+      <UseHostLibraryDependencies>true</UseHostLibraryDependencies>
+    </CudaLink>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -127,7 +137,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Precise</FloatingPointModel>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <Optimization>MaxSpeed</Optimization>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
@@ -143,7 +153,18 @@
     </Link>
     <CudaCompile>
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+      <FastMath>true</FastMath>
+      <CodeGeneration>compute_61,sm_61</CodeGeneration>
+      <MaxRegCount>0</MaxRegCount>
+      <CudaRuntime>Static</CudaRuntime>
+      <ExtensibleWholeProgramCompilation>false</ExtensibleWholeProgramCompilation>
+      <InterleaveSourceInPTX>
+      </InterleaveSourceInPTX>
+      <Optimization>O3</Optimization>
     </CudaCompile>
+    <CudaLink>
+      <UseHostLibraryDependencies>true</UseHostLibraryDependencies>
+    </CudaLink>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -156,7 +177,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Precise</FloatingPointModel>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -171,7 +192,17 @@
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
       <GenerateLineInfo>true</GenerateLineInfo>
       <CodeGeneration>compute_61,sm_61</CodeGeneration>
+      <MaxRegCount>0</MaxRegCount>
+      <FastMath>true</FastMath>
+      <CudaRuntime>Static</CudaRuntime>
+      <ExtensibleWholeProgramCompilation>false</ExtensibleWholeProgramCompilation>
+      <InterleaveSourceInPTX>
+      </InterleaveSourceInPTX>
+      <Optimization>Od</Optimization>
     </CudaCompile>
+    <CudaLink>
+      <UseHostLibraryDependencies>true</UseHostLibraryDependencies>
+    </CudaLink>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -186,7 +217,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Precise</FloatingPointModel>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <Optimization>MaxSpeed</Optimization>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
@@ -203,21 +234,39 @@
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+      <FastMath>true</FastMath>
+      <CodeGeneration>compute_61,sm_61</CodeGeneration>
+      <MaxRegCount>0</MaxRegCount>
+      <CudaRuntime>Static</CudaRuntime>
+      <ExtensibleWholeProgramCompilation>false</ExtensibleWholeProgramCompilation>
+      <InterleaveSourceInPTX>
+      </InterleaveSourceInPTX>
+      <Optimization>O3</Optimization>
     </CudaCompile>
+    <CudaLink>
+      <UseHostLibraryDependencies>true</UseHostLibraryDependencies>
+    </CudaLink>
   </ItemDefinitionGroup>
   <ItemGroup>
     <CudaCompile Include="Camera.cu">
       <FileType>Document</FileType>
     </CudaCompile>
-    <ClCompile Include="CpuGraphics.cpp" />
+    <ClCompile Include="CpuGraphics.cpp">
+      <FileType>Document</FileType>
+    </ClCompile>
+    <CudaCompile Include="CpuGraphicsExtensions.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
     <CudaCompile Include="Cube.cu">
       <FileType>Document</FileType>
     </CudaCompile>
+    <ClCompile Include="DirectXGraphics.cpp" />
     <ClCompile Include="EFException.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Window.cpp" />
+    <CudaCompile Include="RayMarchingGraphics.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -228,12 +277,15 @@
     <ClInclude Include="CubesArrayScene_CUDA.h">
       <FileType>Document</FileType>
     </ClInclude>
+    <ClInclude Include="DirectXGraphics.h" />
     <ClInclude Include="EFException.h" />
     <ClInclude Include="EFWin.h" />
     <ClInclude Include="CudaHelper.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="Matrix3.h" />
+    <ClInclude Include="RayMarchingGraphics.h" />
+    <ClInclude Include="SphereArrayScene_Device.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vec2f.h" />
     <ClInclude Include="Vec3.h" />
@@ -241,11 +293,35 @@
     <ClInclude Include="ZBuffer.h" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="CubesArrayScene_CUDA.cu" />
+    <CudaCompile Include="CubesArrayScene_CUDA.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
     <CudaCompile Include="GpuGraphics.cu">
       <FileType>Document</FileType>
     </CudaCompile>
     <ClInclude Include="GpuGraphics.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="PixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="VertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

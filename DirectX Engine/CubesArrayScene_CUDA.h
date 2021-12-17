@@ -2,11 +2,12 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
+#include "CpuGraphics.h"
+#include "EFWin.h"
+#include "Keyboard.h"
 #include "GpuGraphics.h"
 #include "CudaHelper.h"
-#include "Window.h"
 #include "MathHelper.h"
-
 
 class CubesArrayScene_CUDA
 {

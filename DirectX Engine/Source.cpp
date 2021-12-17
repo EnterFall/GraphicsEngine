@@ -3,6 +3,7 @@
 #include "Matrix3.h"
 #include "CubesArrayScene_CUDA.h"
 #include "CubesArrayScene.h"
+#include "SphereArrayScene_Device.h"
 
 int WINAPI WinMain(
 	HINSTANCE hInstance,
@@ -15,15 +16,17 @@ int WINAPI WinMain(
 		Window w1(1900, 1000, "LolTestLol");
 
 		CudaAssert(cudaSetDevice(0));
-		CudaAssert(cudaDeviceSetLimit(cudaLimitMallocHeapSize, 1024 * 1024 * 1024));
+		CudaAssert(cudaDeviceSetLimit(cudaLimitMallocHeapSize, 1024 * 1024 * 128));
+		CudaAssert(cudaDeviceSetCacheConfig(cudaFuncCachePreferEqual));
 
-		auto scene = CubesArrayScene_CUDA(&w1.graphics, &w1.keyboard, 40);
+		auto scene = SphereArrayScene_Device(&w1.graphics, &w1.keyboard, 40);
 		while (true)
 		{
 			auto s = std::chrono::high_resolution_clock::now();
 			
 			if (!w1.ProcessMessages())
 			{
+				scene.Dispose();
 				CudaAssert(cudaDeviceReset());
 				return 0;
 			}
@@ -34,12 +37,12 @@ int WINAPI WinMain(
 			w1.graphics.zBuffer.Clear();
 
 			auto e1 = std::chrono::high_resolution_clock::now();
-			auto fps = 1.0 / std::chrono::duration<double>(e1 - s).count();
+			auto fps = 1.0f / std::chrono::duration<float>(e1 - s).count();
 			if (fps > 1000)
 			{
 				Sleep(10);
 			}
-			w1.SetTitle(std::to_string(fps) + " isMatrix: " + std::to_string(w1.graphics.isMatrixTransform));
+			w1.SetTitle(std::to_string(fps) + " Draw (ms): " + std::to_string(scene.time * 1000.0));
 		};
 	}
 	catch (EFException& e)

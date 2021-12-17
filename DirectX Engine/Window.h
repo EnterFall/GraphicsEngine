@@ -1,11 +1,10 @@
 #pragma once
 #include "EFWin.h"
 #include "EFException.h"
+#include "DirectXGraphics.h"
 #include "Vec2f.h"
 #include "CpuGraphics.h"
 #include "Keyboard.h"
-#include <memory>
-#include <algorithm>
 
 #define WindowExcept(errCode) Window::Exception(__LINE__, __FILE__, errCode)
 #define WindowExceptLastError() Window::Exception(__LINE__, __FILE__, GetLastError())
@@ -15,6 +14,7 @@ public:
 	int height;
 	int width;
 	CpuGraphics graphics;
+	std::unique_ptr<DirectXGraphics> dxGraphics;
 	Keyboard keyboard;
 private:
 	HWND hWnd;

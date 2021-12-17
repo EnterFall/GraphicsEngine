@@ -21,7 +21,7 @@ std::string EFException::GetString() const
 	std::ostringstream stream;
 	stream << "[File] " << GetFile() << std::endl
 		   << "[Line] " << GetLine()
-		   << "[Mess] " << message;
+		   << "[Message] " << message;
 	return stream.str();
 }
 

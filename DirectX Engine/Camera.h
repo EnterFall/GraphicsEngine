@@ -7,24 +7,24 @@
 class Camera
 {
 public:
-	Vec3d pos;
-	Vec3d X90;
-	Vec3d Y90;
-	Vec3d Z90;
+	Vec3f pos;
+	Vec3f X90;
+	Vec3f Y90;
+	Vec3f Z90;
 	Matrix3f transform;
-	Vec3d leftNormal;
-	Vec3d rightNormal;
-	Vec3d topNormal;
-	Vec3d bottomNormal;
-	double widthHalf;
-	double heightHalf;
-	double fovW;
-	double fovH;
-	double scaleX;
-	double scaleY;
+	Vec3f leftNormal;
+	Vec3f rightNormal;
+	Vec3f topNormal;
+	Vec3f bottomNormal;
+	float widthHalf;
+	float heightHalf;
+	float fovW;
+	float fovH;
+	float scale;
 public:
-	__host__ __device__ Camera(int width, int height, double fov);
-	__host__ __device__ void Rotate(double x, double y);
-	__host__ __device__ Vec3d ToScreen(const Vec3d& v) const;
+	__host__ __device__ Camera() = default;
+	__host__ __device__ Camera(int width, int height, float fov);
+	__host__ __device__ void Rotate(float x, float y);
+	__host__ __device__ Vec3f ToScreen(const Vec3f& v) const;
 };
 

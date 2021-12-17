@@ -31,6 +31,9 @@
     <Filter Include="Исходные файлы\Scenes">
       <UniqueIdentifier>{4cf7ab7e-2b40-4fa3-b69f-25a4a8c86517}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{2d4fb2fe-c990-4d74-a76c-2d25028d7775}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -42,13 +45,16 @@
     <ClCompile Include="EFException.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="CpuGraphics.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="Keyboard.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="CpuGraphics.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectXGraphics.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -101,11 +107,20 @@
     <ClInclude Include="ZBuffer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="GpuGraphics.h">
+      <Filter>Файлы заголовков\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="RayMarchingGraphics.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="SphereArrayScene_Device.h">
+      <Filter>Файлы заголовков\Scenes</Filter>
+    </ClInclude>
     <ClInclude Include="CudaHelper.h">
       <Filter>Файлы заголовков\CUDA</Filter>
     </ClInclude>
-    <ClInclude Include="GpuGraphics.h">
-      <Filter>Файлы заголовков\CUDA</Filter>
+    <ClInclude Include="DirectXGraphics.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -115,11 +130,25 @@
     <CudaCompile Include="Cube.cu">
       <Filter>Исходные файлы\Geometry</Filter>
     </CudaCompile>
-    <CudaCompile Include="CubesArrayScene_CUDA.cu">
-      <Filter>Исходные файлы\Scenes</Filter>
-    </CudaCompile>
     <CudaCompile Include="Camera.cu">
       <Filter>Исходные файлы</Filter>
     </CudaCompile>
+    <CudaCompile Include="CubesArrayScene_CUDA.cu">
+      <Filter>Исходные файлы\Scenes</Filter>
+    </CudaCompile>
+    <CudaCompile Include="CpuGraphicsExtensions.cu">
+      <Filter>Исходные файлы\CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="RayMarchingGraphics.cu">
+      <Filter>Исходные файлы\CUDA</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
