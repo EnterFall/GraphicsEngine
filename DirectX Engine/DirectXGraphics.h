@@ -3,8 +3,11 @@
 #include <d3d11.h>
 #include <string>
 #include <comdef.h>
+#include <DirectXMath.h>
 #include "EFWin.h"
 #include "EFException.h"
+#include "Camera.h"
+#include "DXCamera.h"
 
 class DXCodeError
 {
@@ -53,7 +56,10 @@ private:
 public:
 	DirectXGraphics(HWND hwnd);
 	void EndFrame();
-	void TestDrawTriangle();
+	void DrawTestTriangle(const DXCamera& cam, float pitch, float yaw, DirectX::XMMATRIX view);
+	void CreateSetVShaderAndIL(LPCWCHAR fileName);
+	void CreateSetPShader(LPCWCHAR fileName);
+	void ConstBufferVSSet(size_t bSize, void* dataFrom);
 	void Clear(float r, float g, float b);
 private:
 	template <class T>

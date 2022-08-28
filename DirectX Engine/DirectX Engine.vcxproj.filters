@@ -122,6 +122,12 @@
     <ClInclude Include="DirectXGraphics.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="DXCameraTestScene.h">
+      <Filter>Файлы заголовков\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="DXCamera.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="GpuGraphics.cu">

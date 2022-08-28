@@ -28,5 +28,6 @@ public:
 private:
 	__host__ void Init(int width, int height, cudaSurfaceObject_t screenBuffer);
 	__device__ float IntegrateLight(float distanceS, float distanceE, float length);
-	__device__ float DEMandelbulb(Vec3f ray_pos);
+	__device__ float DEMandelbulb(Vec3f ray_pos, float oldDist);
+	__device__ float DEMandelbulbDouble(Vec3f ray_pos, double oldDist);
 };

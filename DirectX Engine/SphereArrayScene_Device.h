@@ -23,7 +23,7 @@ public:
 	SphereArrayScene_Device(CpuGraphics* g, Keyboard* kbd, unsigned int size) : g(g), kbd(kbd), size(size)
 	{
 		isFreeCamera = false;
-		g->camera.pos = Vec3f(3.0f, 3.0f, 3.0f);
+		g->camera.pos = Vec3f(1.0f, 1.0f, 1.0f);
 		g->camera.Rotate(MathHelper::PI_4 + 3.1f, MathHelper::PI_4 - 1.5f);
 		
 		cameraCuda = CudaHelper::CreateManagedCudaObj<Camera>();
@@ -125,12 +125,15 @@ public:
 		time = 0.0f;
 
 		auto start = std::chrono::high_resolution_clock::now();
-		rayG->Draw(cameraCuda, g->bufferWidth, g->bufferHeight, sphereRadius);
-		CudaAssert(cudaGetLastError());
-		CudaAssert(cudaDeviceSynchronize());
-		time = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start).count();
+		
+
+		
 
 		CudaAssert(cudaMemcpy2DFromArrayAsync(g->screenBuffer.get(), g->bufferWidth * sizeof(Color), screenBuffer_array, 0, 0, g->bufferWidth * sizeof(Color), g->bufferHeight, cudaMemcpyDeviceToHost));
+		CudaAssert(cudaDeviceSynchronize());
+		rayG->Draw(cameraCuda, g->bufferWidth, g->bufferHeight, sphereRadius);
+		
+		time = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start).count();
 	}
 
 	void Dispose()

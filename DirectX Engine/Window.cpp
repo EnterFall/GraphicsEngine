@@ -112,16 +112,15 @@ void Window::UpdateScreen()
 	this->width = width;
 	this->height = height;
 
-	POINT location{ 0, 0 };
-	if (!ClientToScreen(hWnd, &location))
-		throw WindowExceptLastError();
+	//POINT location{ 0, 0 };
+	//if (!ClientToScreen(hWnd, &location))
+	//	throw WindowExceptLastError();
 
-	if (!StretchDIBits(hdc, 0, 0, width, height, location.x, graphics.bufferHeight - location.y - height, width, height, graphics.GetScreenBuffer(), &graphics.GetBufferInfo(), DIB_RGB_COLORS, SRCCOPY))
-		throw WindowExceptLastError();
+	//if (!StretchDIBits(hdc, 0, 0, width, height, location.x, graphics.bufferHeight - location.y - height, width, height, graphics.GetScreenBuffer(), &graphics.GetBufferInfo(), DIB_RGB_COLORS, SRCCOPY))
+	//	throw WindowExceptLastError();
 
 	//dxGraphics->Clear(1.0f, 0.0f, 0.0f);
-	//dxGraphics->TestDrawTriangle();
-
+	//dxGraphics->DrawTestTriangle();
 	//dxGraphics->EndFrame();
 }
 

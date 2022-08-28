@@ -46,12 +46,14 @@ private:
 		static LPCSTR GetName();
 	private:
 		StaticWindowClass();
+		// !деструктор выбрасывает исключение!
 		~StaticWindowClass();
 		StaticWindowClass(const StaticWindowClass&) = delete;
 		StaticWindowClass& operator =(const StaticWindowClass&) = delete;
 	};
 public:
 	Window(int width, int height, std::string title);
+	// !деструктор выбрасывает исключение!
 	~Window();
 	HWND GetHWnd() const;
 	CpuGraphics& GetGraphics();

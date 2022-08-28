@@ -120,6 +120,12 @@ struct Vec3
 		y *= len;
 		z *= len;
 	}
+
+	__host__ __device__ Vec3 Normal()
+	{
+		auto len = 1.0f / Length();
+		return Vec3f(x * len, y * len, z * len);
+	}
 };
 typedef Vec3<int> Vec3i;
 typedef Vec3<float> Vec3f;

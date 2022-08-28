@@ -4,6 +4,7 @@
 #include "CubesArrayScene_CUDA.h"
 #include "CubesArrayScene.h"
 #include "SphereArrayScene_Device.h"
+#include "DXCameraTestScene.h"
 
 int WINAPI WinMain(
 	HINSTANCE hInstance,
@@ -13,13 +14,14 @@ int WINAPI WinMain(
 {
 	try
 	{
-		Window w1(1900, 1000, "LolTestLol");
+		Window w1(1600, 800, "LolTestLol");
 
 		CudaAssert(cudaSetDevice(0));
 		CudaAssert(cudaDeviceSetLimit(cudaLimitMallocHeapSize, 1024 * 1024 * 128));
 		CudaAssert(cudaDeviceSetCacheConfig(cudaFuncCachePreferEqual));
 
-		auto scene = SphereArrayScene_Device(&w1.graphics, &w1.keyboard, 40);
+		//auto scene = SphereArrayScene_Device(&w1.graphics, &w1.keyboard, 40);
+		auto scene = DXCameraTestScene(&w1, w1.dxGraphics.get(), &w1.keyboard);
 		while (true)
 		{
 			auto s = std::chrono::high_resolution_clock::now();
@@ -31,10 +33,13 @@ int WINAPI WinMain(
 				return 0;
 			}
 
+			
 			scene.Play();
 
-			w1.UpdateScreen();
-			w1.graphics.zBuffer.Clear();
+			//w1.UpdateScreen();
+			// 
+			//w1.graphics.zBuffer.Clear();
+
 
 			auto e1 = std::chrono::high_resolution_clock::now();
 			auto fps = 1.0f / std::chrono::duration<float>(e1 - s).count();

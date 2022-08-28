@@ -30,7 +30,7 @@ __host__ void RayMarchingGraphics::Init(int width, int height, cudaSurfaceObject
 	widthHalf = width >> 1;
 	heightHalf = height >> 1;
 	//minRayDistance = 0.001f;
-	  minRayDistance = 0.0001f;
+	  minRayDistance = 0.001f;
 	this->screenBuffer = screenBuffer;
 }
 
@@ -40,6 +40,7 @@ __host__ void RayMarchingGraphics::Draw(Camera* cameraCudaPtr, int width, int he
 	dim3 thread = dim3(tileSide, tileSide);
 	dim3 block = dim3((width / tileSide) + 1, (height / tileSide) + 1);
 	RayMarchingGraphics_Draw << <block, thread >> > (this, cameraCudaPtr, sphereRadius);
+	CudaAssert(cudaGetLastError());
 }
 
 __device__ float RayMarchingGraphics::DistanceToSphere(const Vec3f& dir, float sphereRadius)
@@ -84,7 +85,8 @@ __device__ void RayMarchingGraphics::DrawDevice(Camera* camera, float sphereRadi
 
 		Vec3f objPos;
 		float stepColor = 0.0f;
-		float oldDistance = 0.0f;
+		float sumDist = 0.0f;
+		float oldDist = 0.0f;
 		for (int step = 0; step < 1000; step++)
 		{
 			//objPos.x = clamp(roundf(rayPos.x), 0.0f, maxLimit);
@@ -96,10 +98,13 @@ __device__ void RayMarchingGraphics::DrawDevice(Camera* camera, float sphereRadi
 
 			Vec3f dis = objPos - rayPos;
 			//float distance = DistanceToSphere(dis, sphereRadius);
-			float distance = DEMandelbulb(rayPos);
+			
+			float distance = DEMandelbulb(rayPos, oldDist);
+
 			if (distance > 10000.0f || stepColor >= 255.0f)
 			{
 				float color = fminf(stepColor, 255.0f);
+				//float color = 255.0f;
 				surf2Dwrite<int>(Color(color, color, color).dword, screenBuffer, i * sizeof(int), j);
 				return;
 			}
@@ -107,7 +112,7 @@ __device__ void RayMarchingGraphics::DrawDevice(Camera* camera, float sphereRadi
 			//stepColor += IntegrateLight(distance, DistanceToSphere(objPos - (rayPos + (dir * (distance * 0.90f))), sphereRadius), distance) * 0.05f;
 			//dir * (dis.Length() / dir.Dot(dis)) - dis).Length() < sphereRadius
 
-			if (distance < minRayDistance && distance < minRayDistance * (rayPos - camera->pos).Length())
+			if (distance < minRayDistance && distance < fmaxf(minRayDistance * sumDist, 0.000001f))
 			{
 				Vec3f d = rayPos - objPos;
 				d.Normalize();
@@ -129,7 +134,8 @@ __device__ void RayMarchingGraphics::DrawDevice(Camera* camera, float sphereRadi
 				return;
 			}
 			rayPos += (dir * (distance * 1.00f));
-			oldDistance = distance;
+			sumDist += distance;
+			oldDist = distance;
 		}
 		float color = fminf(stepColor, 255.0f);
 		surf2Dwrite<int>(Color(color, color, color).dword, screenBuffer, i * sizeof(int), j);
@@ -164,7 +170,7 @@ __device__ void RayMarchingGraphics::Fractal(Camera* camera_DevPtr, float zoom)
 	}
 }
 
-__device__ float RayMarchingGraphics::DEMandelbulb(Vec3f ray_pos) {
+__device__ float RayMarchingGraphics::DEMandelbulb(Vec3f ray_pos, float oldDist) {
 	float POWER = 8.0f;
 	float TARGET_POS[3] = { 0.0f, 0.0f, 0.0f };
 
@@ -175,7 +181,8 @@ __device__ float RayMarchingGraphics::DEMandelbulb(Vec3f ray_pos) {
 	float theta;
 	float phi;
 	float zr;
-	for (int tmp_iter = 0; tmp_iter < 10; tmp_iter++) {
+	for (int tmp_iter = 0; tmp_iter < 16; tmp_iter++)
+	{
 		r = tmp_pos.Length();
 		if (r > 2.0f) { break; }
 		// approximate the distance differential
@@ -193,4 +200,41 @@ __device__ float RayMarchingGraphics::DEMandelbulb(Vec3f ray_pos) {
 	}
 	// distance estimator
 	return 0.5f * logf(r) * r / dr;
+}
+
+__device__ float RayMarchingGraphics::DEMandelbulbDouble(Vec3f ray_pos, double oldDist) {
+	double POWER = 8.0;
+	double TARGET_POS[3] = { 0.0, 0.0, 0.0 };
+
+	Vec3d ray_pos2;
+
+	ray_pos2.x = ray_pos.x;
+	ray_pos2.y = ray_pos.y;
+	ray_pos2.z = ray_pos.z;
+	Vec3d tmp_pos = ray_pos2;
+	Vec3d cart_pos;
+	double dr = 1.0;
+	double r;
+	double theta;
+	double phi;
+	double zr;
+	for (int tmp_iter = 0; tmp_iter < 16; tmp_iter++)
+	{
+		r = tmp_pos.Length();
+		if (r > 2.0) { break; }
+		// approximate the distance differential
+		dr = POWER * pow(r, POWER - 1.0) * dr + 1.0;
+		// calculate fractal surface
+		// convert to polar coordinates
+		theta = POWER * acos(tmp_pos.z / r);
+		phi = POWER * atan2(tmp_pos.y, tmp_pos.x);
+		zr = pow(r, POWER);
+		// convert back to cartesian coordinated
+		cart_pos.x = zr * sin(theta) * cos(phi);
+		cart_pos.y = zr * sin(theta) * sin(phi);
+		cart_pos.z = zr * cos(theta);
+		tmp_pos = ray_pos2 + cart_pos;
+	}
+	// distance estimator
+	return 0.5 * log(r) * r / dr;
 }
