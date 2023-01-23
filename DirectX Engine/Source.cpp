@@ -20,8 +20,8 @@ int WINAPI WinMain(
 		CudaAssert(cudaDeviceSetLimit(cudaLimitMallocHeapSize, 1024 * 1024 * 128));
 		CudaAssert(cudaDeviceSetCacheConfig(cudaFuncCachePreferEqual));
 
-		//auto scene = SphereArrayScene_Device(&w1.graphics, &w1.keyboard, 40);
-		auto scene = DXCameraTestScene(&w1, w1.dxGraphics.get(), &w1.keyboard);
+		auto scene = SphereArrayScene_Device(&w1.graphics, &w1.keyboard, 40);
+		//auto scene = DXCameraTestScene(&w1, w1.dxGraphics.get(), &w1.keyboard);
 		while (true)
 		{
 			auto s = std::chrono::high_resolution_clock::now();

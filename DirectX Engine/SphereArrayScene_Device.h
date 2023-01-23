@@ -127,8 +127,6 @@ public:
 		auto start = std::chrono::high_resolution_clock::now();
 		
 
-		
-
 		CudaAssert(cudaMemcpy2DFromArrayAsync(g->screenBuffer.get(), g->bufferWidth * sizeof(Color), screenBuffer_array, 0, 0, g->bufferWidth * sizeof(Color), g->bufferHeight, cudaMemcpyDeviceToHost));
 		CudaAssert(cudaDeviceSynchronize());
 		rayG->Draw(cameraCuda, g->bufferWidth, g->bufferHeight, sphereRadius);

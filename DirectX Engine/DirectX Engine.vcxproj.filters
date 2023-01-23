@@ -57,6 +57,9 @@
     <ClCompile Include="DirectXGraphics.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="SphereArrayScene_Device.h">
+      <Filter>Файлы заголовков\Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EFWin.h">
@@ -112,9 +115,6 @@
     </ClInclude>
     <ClInclude Include="RayMarchingGraphics.h">
       <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="SphereArrayScene_Device.h">
-      <Filter>Файлы заголовков\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="CudaHelper.h">
       <Filter>Файлы заголовков\CUDA</Filter>

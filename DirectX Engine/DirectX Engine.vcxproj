@@ -289,7 +289,7 @@
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="Matrix3.h" />
     <ClInclude Include="RayMarchingGraphics.h" />
-    <ClInclude Include="SphereArrayScene_Device.h" />
+    <ClCompile Include="SphereArrayScene_Device.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vec2f.h" />
     <ClInclude Include="Vec3.h" />
